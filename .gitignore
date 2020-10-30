@@ -1,2 +1,10 @@
 
 .gitignore.txt
+__pycache__/states.cpython-38.pyc
+__pycache__/player.cpython-38.pyc
+__pycache__/enums.cpython-38.pyc
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/BurritoEater.iml
+.idea/workspace.xml
