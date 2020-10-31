@@ -8,3 +8,5 @@ __pycache__/enums.cpython-38.pyc
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/BurritoEater.iml
 .idea/workspace.xml
+.idea/vcs.xml
+__pycache__/words.cpython-38.pyc

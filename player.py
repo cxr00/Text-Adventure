@@ -17,6 +17,8 @@ class Player:
     NEEDS_TO_POOP = False
     HAS_POOPED = False
 
+    HAS_ILLEGAL_CURRENCY = False
+
     @staticmethod
     def reset():
         # Player variables
@@ -32,6 +34,8 @@ class Player:
         Player.DRANK_PEPSI = False
         Player.NEEDS_TO_POOP = False
         Player.HAS_POOPED = False
+
+        Player.HAS_ILLEGAL_CURRENCY = False
 
         print("You have been reset.")
 

@@ -1,31 +1,39 @@
-from enum import IntEnum
+from enum import Enum, auto
 
 
-class Room(IntEnum):
-    BEDROOM = 0
-    BATHROOM = 1
-    KITCHEN = 2
-    VENDOR = 3
-    MONETIZOR = 4
-    TRASH_CAN = 5
-    OUTSIDE = 6
-    CELLAR = 7
+# The set of rooms and room-like states
+class Room(Enum):
+    BEDROOM = "bedroom"
+    BATHROOM = "bathroom"
+
+    KITCHEN = "kitchen"
+    VENDOR = "vendor"
+    MONETIZOR = "monetizor"
+    TRASH_CAN = "trash can"
+
+    OUTSIDE = "outside"
+    CELLAR = "cellar"
 
 
-class Item(IntEnum):
-    WIDGET = 0
+# The set of items which may appear in the player's inventory
+class Item(Enum):
+    WIDGET = "widget"
 
-    BURRITO = 1
-    BANANA = 2
-    SODA = 3
+    BURRITO = "burrito"
+    BURRITO_WRAPPER = "burrito wrapper"
 
-    WRAPPER = 4
-    PEEL = 5
-    SODA_CAN = 6
-    TRASH = 7
+    BANANA = "banana"
+    PEELED_BANANA = "peeled banana"
+    BANANA_PEEL = "banana peel"
 
-    KEY = 8
+    SODA = "soda"
+    SODA_CAN = "soda can"
+
+    TRASH = "trash"
+
+    CELLAR_KEY = "cellar key"
 
 
-class Charm(IntEnum):
-    GENERATE = 0
+# The set of charms which may appear in the player's charm box
+class Charm(Enum):
+    GENERATE = "generate"

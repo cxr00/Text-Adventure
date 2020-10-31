@@ -1,6 +1,9 @@
 
 class Env:
 
+    class Universal:
+        ILLEGAL_CURRENCY_DISCOVERED = False
+
     class Bathroom:
         SITTING_ON_TOILET = False
         KEY_ON_FLOOR = True
