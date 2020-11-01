@@ -3,6 +3,7 @@ from states import Env
 from player import Player
 from words import Words, GameText
 
+
 ROOMS = {}
 DESC = {}
 
@@ -15,17 +16,7 @@ def get_command():
     Takes input and converts it into an array command
     """
     global command
-    out = input(">>> ").split(" ")
-    command = [e.lower() for e in out]
-
-
-# Checks a list for at least one match
-# Used for primary command interpreters
-def at_least_one_match(e, cmd):
-    for each in e:
-        if cmd == each:
-            return True
-    return False
+    command = [e.lower() for e in input(">>> ").split(" ")]
 
 
 def check_command(*args):
@@ -36,11 +27,11 @@ def check_command(*args):
     :return: Whether args matches command
     """
 
-    def fun(args, n):
+    def arg_matches_command(n):
         # Synonym engine
         # Returns True if there is at least one match
         if isinstance(args[n], list):
-            if not at_least_one_match(args[n], command[n]):
+            if not command[n] in args[n]:
                 return False
         elif command[n] != args[n].lower():
             return False
@@ -51,7 +42,7 @@ def check_command(*args):
 
     n = 0
     while n < len(args):
-        if not fun(args, n):
+        if not arg_matches_command(n):
             return False
         n += 1
 
@@ -69,7 +60,7 @@ def go(*loc):
             # Synonym engine
             # Returns True if there is at least one match
             if isinstance(e[0], list):
-                if at_least_one_match(e[0], command[n]):
+                if command[n] in e[0]:
                     Player.change_room(e[1])
                     return True
             elif command[n] == e[0]:
@@ -83,7 +74,7 @@ def look(args):
     if check_command("look"):
         n = 2 if command[1] == "at" else 1
         if isinstance(args, list):
-            if not at_least_one_match(args, command[n]):
+            if not command[n] in args:
                 return False
         elif command[n] != args:
             return False
@@ -144,7 +135,7 @@ def inventory_check():
         if look("banana"):
             print("A banana from the vendor.")
             if Item.BANANA in Player.inventory:
-                print("I need to PEEL it")
+                print("I need to PEEL it.")
             return True
         elif check_command("eat", "banana"):
             if Item.PEELED_BANANA in Player.inventory:
@@ -177,6 +168,7 @@ def charm_check():
             else:
                 print("You already have a widget in your possession.")
             return True
+
     return False
 
 
@@ -184,9 +176,6 @@ def charm_check():
 def misc_check():
     if check_command("credits") or look("credits") or check_command("check", "credits"):
         print("You have %s credits." % Player.credits)
-        return True
-    elif check_command("reset"):
-        Player.reset()
         return True
     elif look(["inventory", "items"]):
         print("You take a look at your possessions:")
@@ -199,11 +188,16 @@ def misc_check():
             print(e.value)
         return True
 
+    elif check_command("reset"):
+        Player.reset()
+        Env.reset()
+        return True
     # Whatever I need to speed up testing
     elif check_command("debug"):
-        Player.HAS_ILLEGAL_CURRENCY = True
-        Player.give_credits(10)
-        Player.change_room(Room.VENDOR)
+        Player.give_credits(30)
+        Player.give_item(Item.TRASH)
+        Player.give_item(Item.WIDGET)
+        Player.change_room(Room.KITCHEN)
         return True
 
     return False
@@ -238,7 +232,10 @@ def register_room(room, description):
 
 @register_room(Room.BEDROOM, GameText.RoomDescriptions.bedroom)
 def bedroom():
-    if go(("bathroom", Room.BATHROOM), ("kitchen", Room.KITCHEN)):
+    if go(
+        ("bathroom", Room.BATHROOM),
+        ("kitchen", Room.KITCHEN)
+    ):
         return True
     else:
         if look_around("bedroom"):
@@ -249,6 +246,7 @@ def bedroom():
         elif look("floor"):
             print("There is nothing on the floor.")
             return True
+
     return False
 
 
@@ -261,15 +259,14 @@ def bathroom():
             print("Your own bathroom. How lucky!")
             print("Your toilet lid is up.")
             if Env.Bathroom.KEY_ON_FLOOR:
-                print("There is a key on the floor.")
+                print("There is a KEY on the floor.")
             return True
         elif look("floor"):
             if Env.Bathroom.KEY_ON_FLOOR:
                 print("There is a KEY on the floor.")
-                return True
             else:
                 print("There is nothing on the floor.")
-                return True
+            return True
         elif check_command("sit", "toilet"):
             Env.Bathroom.SITTING_ON_TOILET = True
             print("You sit on the toilet.")
@@ -302,17 +299,22 @@ def bathroom():
         elif look("floor"):
             if Env.Bathroom.KEY_ON_FLOOR:
                 print("There is a KEY on the floor.\nYou can't reach it from here.")
-                return True
             else:
                 print("There is nothing on the floor.")
-                return True
+            return True
 
     return False
 
 
 @register_room(Room.KITCHEN, GameText.RoomDescriptions.kitchen)
 def kitchen():
-    if go(("bedroom", Room.BEDROOM), ("vendor", Room.VENDOR), ("monetizor", Room.MONETIZOR), (["outside", "out"], Room.OUTSIDE)):
+    if go(
+          ("bedroom", Room.BEDROOM),
+          ("vendor", Room.VENDOR),
+          ("monetizor", Room.MONETIZOR),
+          (["outside", "out"], Room.OUTSIDE),
+          ("trash", Room.TRASH_CAN)
+    ):
         return True
     else:
         if look_around("kitchen"):
@@ -324,19 +326,15 @@ def kitchen():
         elif look("floor"):
             print("There is nothing on the floor.")
             return True
-        elif check_command(["look", "go", "use"], "trash") or check_command("throw", "away", "trash"):
+        elif check_command(["look", "use"], "trash") or check_command("throw", "away", "trash"):
             Player.change_room(Room.TRASH_CAN)
             return True
+
     return False
 
 
 @register_room(Room.VENDOR, GameText.RoomDescriptions.vendor)
 def vendor():
-
-    def buy(name, item):
-        Player.take_credits(10)
-        Player.give_item(item)
-        print("You buy a %s." % name)
 
     def check_for_illegal_currency():
         if Player.HAS_ILLEGAL_CURRENCY:
@@ -349,32 +347,30 @@ def vendor():
             return True
         return False
 
-    if Player.credits >= 10:
-        if check_command("buy", "burrito"):
-            buy("burrito", Item.BURRITO)
+    def buy(item):
+        if Player.credits >= 10:
+            Player.take_credits(10)
+            Player.give_item(item)
+            print("You buy a %s." % item.value)
             check_for_illegal_currency()
-            return True
-        elif check_command("buy", "banana"):
-            buy("banana", Item.BANANA)
-            check_for_illegal_currency()
-            return True
-        elif check_command("buy", "soda"):
-            buy("soda", Item.SODA)
-            check_for_illegal_currency()
-            return True
-    elif check_command("buy"):
-        print("You cannot afford anything.")
+        else:
+            print("You cannot afford the %s." % item.value)
         return True
 
-    if look("vendor"):
+    if check_command("buy", "burrito"):
+        return buy(Item.BURRITO)
+    elif check_command("buy", "banana"):
+        return buy(Item.BANANA)
+    elif check_command("buy", "soda"):
+        return buy(Item.SODA)
+
+    if look_around("vendor"):
         print("There is a sticker on the vendor which reads:")
         print("Remember: Illegal Currency is Illegal.")
+        print("The vendor contains: BURRITO, BANANA, and SODA.")
         return True
     if check_command("leave") or check_command("go", "kitchen"):
         Player.change_room(Room.KITCHEN)
-        return True
-    elif look_around("vendor"):
-        print("BURRITO, BANANA, or SODA?")
         return True
 
     return False
@@ -382,21 +378,40 @@ def vendor():
 
 @register_room(Room.MONETIZOR, GameText.RoomDescriptions.monetizor)
 def monetizor():
-    if look_around("monetizor"):
+
+    if go(("kitchen", Room.KITCHEN)):
+        return True
+    elif look_around("monetizor"):
         print("There is a sticker on the side of the monetizor which reads:")
         print("INSERT contraband for a credit reward.")
         return True
-    elif check_command(["insert", "put", "place", "give"], ["charm", "generate"]):
-        Player.give_credits(50)
-        Player.take_charm(Charm.GENERATE)
-        print("You put the generate charm into the monetizor.")
-        print("It whirs and spits out 50 credits. Sweet!")
+    elif check_command("leave"):
         Player.change_room(Room.KITCHEN)
         return True
-    elif check_command("leave") or check_command("go", "kitchen"):
-        print("You leave the monetizor.")
-        Player.change_room(Room.KITCHEN)
-        return True
+
+    if Charm.GENERATE in Player.charms:
+        if check_command(Words.INSERT, ["charm", "generate"]):
+            Player.give_credits(50)
+            Player.take_charm(Charm.GENERATE)
+            print("You put the generate charm into the monetizor.")
+            print("It whirs and spits out 50 credits. Sweet!")
+            Player.change_room(Room.KITCHEN)
+            return True
+
+    if Item.WIDGET in Player.inventory:
+        if check_command(Words.INSERT, "widget"):
+            Player.give_credits(5)
+            Player.take_item(Item.WIDGET)
+            Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = True
+            print("You put the widget into the monetizor.")
+            print("It whirs and spits out 5 credits. Not bad.")
+
+            print("The monetizor booms in a loud voice:")
+            print("SUPER ILLEGAL ITEM DETECTED. PREPARE TO BE TAKEN INTO CUSTODY.")
+            print("...")
+            print("Suddenly two robot officers appear and arrest you.")
+            print("You shouldn't have messed with that WIDGET!")
+            return True
 
     return False
 
@@ -408,10 +423,12 @@ def trash_can():
         if Env.trash_is_full() and not Env.Kitchen.TRASH_TAKEN:
             print("The trash is full. Better TAKE it out.")
 
-    if check_command("leave") or check_command("go", "kitchen"):
+    if go(("kitchen", Room.KITCHEN)):
+        return True
+    elif check_command("leave"):
         Player.change_room(Room.KITCHEN)
         return True
-    elif look("trash"):
+    elif look_around("trash"):
         if Env.trash_is_full():
             if Env.Kitchen.TRASH_TAKEN:
                 print("The trash can is empty.")
@@ -499,7 +516,7 @@ def outside():
 
 @register_room(Room.CELLAR, GameText.RoomDescriptions.cellar)
 def cellar():
-    if go((["upstairs", "outside"], Room.OUTSIDE)):
+    if go((["upstairs", "outside", "out"], Room.OUTSIDE)):
         return True
     else:
         if look_around("cellar"):
@@ -516,29 +533,33 @@ def cellar():
     return False
 
 
-print("Welcome to Burrito Eater 2021")
+def run_game():
+    global end
+    print("Welcome to Burrito Eater 2021")
 
-while not end:
+    while not end:
 
-    for room in Room:
-        if Player.location == room:
+        for room in Room:
+            if Player.location == room:
 
-            # Only print room description when you enter a room
-            if Player.previous_loc != room:
-                print(DESC[room])
-            Player.change_room(room)
+                # Only print room description when you enter a room
+                if Player.previous_loc != room:
+                    print(DESC[room])
+                Player.change_room(room)
 
-            # Run the specific room function
-            ROOMS[room]()
+                # Run the specific room function
+                ROOMS[room]()
 
-            # Check win condition
-            if Env.Outside.TRASH_IN_BIN and Player.HAS_POOPED:
-                end = True
-            elif Env.Universal.ILLEGAL_CURRENCY_DISCOVERED:
-                print("YOU HAVE LOST THE GAME.")
-                exit(0)
+                # Check win condition
+                if Env.Outside.TRASH_IN_BIN and Player.HAS_POOPED:
+                    end = True
+                # Check lose condition
+                elif Env.Universal.ILLEGAL_CURRENCY_DISCOVERED or Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED:
+                    print("YOU HAVE LOST THE GAME.")
+                    exit(0)
 
-            break
+                break
+    print("Game Complete! Congratulations!")
 
 
-print("Game Complete! Congratulations!")
+run_game()

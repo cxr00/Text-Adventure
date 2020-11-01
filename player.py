@@ -71,8 +71,10 @@ class Player:
 
     @staticmethod
     def give_credits(amount):
+        # Add an amount of credits to your possession
         Player.credits += amount
 
     @staticmethod
     def take_credits(amount):
+        # Take an amount of credits from your possession
         Player.credits -= amount

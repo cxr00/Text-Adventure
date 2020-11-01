@@ -1,5 +1,6 @@
 class Words:
 
+    INSERT = ["insert", "put", "place", "give"]
     TAKE = ["take", "get", "grab"]
 
 
