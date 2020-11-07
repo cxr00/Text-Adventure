@@ -1,4 +1,5 @@
 import shelve
+import os
 
 
 class Env:
@@ -70,7 +71,11 @@ class Env:
 
     @staticmethod
     def save_game(file_string):
-        with shelve.open("_".join(file_string) + "_env") as db:
+        if isinstance(file_string, list):
+            file_string = "_".join(file_string) + "_env"
+        else:
+            file_string = file_string + "_env"
+        with shelve.open("saves/" + file_string) as db:
             db["univ illegal currency discovered"] = Env.Universal.ILLEGAL_CURRENCY_DISCOVERED
             db["univ super illegal item discovered"] = Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED
 
@@ -87,17 +92,27 @@ class Env:
 
     @staticmethod
     def load_game(file_string):
-        with shelve.open("_".join(file_string) + "_env") as db:
-            Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = bool(db["univ illegal currency discovered"])
-            Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = bool(db["univ super illegal item discovered"])
+        if isinstance(file_string, list):
+            file_string = "_".join(file_string) + "_env"
+        else:
+            file_string = file_string + "_env"
 
-            Env.Bathroom.SITTING_ON_TOILET = bool(db["bathroom sitting on toilet"])
-            Env.Bathroom.KEY_ON_FLOOR = bool(db["bathroom key on floor"])
+        if os.path.exists("saves/" + file_string + ".dat"):
+            with shelve.open("saves/" + file_string) as db:
+                Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = bool(db["univ illegal currency discovered"])
+                Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = bool(db["univ super illegal item discovered"])
 
-            Env.Kitchen.WRAPPER_IN_TRASH = bool(db["kitchen wrapper in trash"])
-            Env.Kitchen.PEEL_IN_TRASH = bool(db["kitchen peel in trash"])
-            Env.Kitchen.CAN_IN_TRASH = bool(db["kitchen can in trash"])
-            Env.Kitchen.TRASH_FULL = bool(db["kitchen trash full"])
-            Env.Kitchen.TRASH_TAKEN = db["kitchen trash taken"]
+                Env.Bathroom.SITTING_ON_TOILET = bool(db["bathroom sitting on toilet"])
+                Env.Bathroom.KEY_ON_FLOOR = bool(db["bathroom key on floor"])
 
-            Env.Cellar.CHARM_ON_TABLE = bool(db["cellar charm on table"])
+                Env.Kitchen.WRAPPER_IN_TRASH = bool(db["kitchen wrapper in trash"])
+                Env.Kitchen.PEEL_IN_TRASH = bool(db["kitchen peel in trash"])
+                Env.Kitchen.CAN_IN_TRASH = bool(db["kitchen can in trash"])
+                Env.Kitchen.TRASH_FULL = bool(db["kitchen trash full"])
+                Env.Kitchen.TRASH_TAKEN = db["kitchen trash taken"]
+
+                Env.Cellar.CHARM_ON_TABLE = bool(db["cellar charm on table"])
+            return True
+        else:
+            print("Save file %s does not exist" % "_".join(file_string))
+            return False

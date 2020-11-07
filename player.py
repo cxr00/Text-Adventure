@@ -1,5 +1,18 @@
 from enums import Room, Charm, Item
 import shelve
+import os
+
+
+def check_for_save_folder():
+    if not os.path.exists("saves"):
+        os.mkdir("saves")
+
+
+def join_file_string(fs):
+    if isinstance(fs, list):
+        return "_".join(fs) + "_player"
+    else:
+        return fs + "_player"
 
 
 class Player:
@@ -42,7 +55,9 @@ class Player:
 
     @staticmethod
     def save_game(file_string):
-        with shelve.open("_".join(file_string) + "_player") as db:
+        check_for_save_folder()
+        file_string = join_file_string(file_string)
+        with shelve.open("saves/" + file_string) as db:
             db["credits"] = Player.credits
             db["inventory"] = [i.value for i in Player.inventory]
             db["charms"] = [c.value for c in Player.charms]
@@ -58,23 +73,31 @@ class Player:
 
     @staticmethod
     def load_game(file_string):
-        with shelve.open("_".join(file_string) + "_player") as db:
-            Player.credits = int(db["credits"])
+        check_for_save_folder()
+        file_string = join_file_string(file_string)
 
-            inventory = db["inventory"]
-            Player.inventory = [Item.get(i) for i in inventory]
+        if os.path.exists("saves/" + file_string + ".dat"):
+            with shelve.open("saves/" + file_string) as db:
+                Player.credits = int(db["credits"])
 
-            charms = db["charms"]
-            Player.charms = [Charm.get(c) for c in charms]
+                inventory = db["inventory"]
+                Player.inventory = [Item.get(i) for i in inventory]
 
-            Player.location = Room.get(db["location"])
-            Player.EATEN_BURRITO = bool(db["eaten burrito"])
-            Player.EATEN_BANANA = bool(db["eaten banana"])
-            Player.DRANK_SODA = bool(db["drank soda"])
-            Player.NEEDS_TO_POOP = bool(db["needs to poop"])
-            Player.HAS_POOPED = bool(db["has pooped"])
+                charms = db["charms"]
+                Player.charms = [Charm.get(c) for c in charms]
 
-            Player.HAS_ILLEGAL_CURRENCY = bool(db["has illegal currency"])
+                Player.location = Room.get(db["location"])
+                Player.EATEN_BURRITO = bool(db["eaten burrito"])
+                Player.EATEN_BANANA = bool(db["eaten banana"])
+                Player.DRANK_SODA = bool(db["drank soda"])
+                Player.NEEDS_TO_POOP = bool(db["needs to poop"])
+                Player.HAS_POOPED = bool(db["has pooped"])
+
+                Player.HAS_ILLEGAL_CURRENCY = bool(db["has illegal currency"])
+            return True
+        else:
+            print("Save file %s does not exist." % file_string)
+            return False
 
     @staticmethod
     def needs_to_poop():

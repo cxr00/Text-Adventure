@@ -198,12 +198,20 @@ def misc_check():
     elif check_command("save"):
         Player.save_game(command[1:])
         Env.save_game(command[1:])
-        print("You have saved the game %s." % " ".join(command[1:]))
+        print("You have saved the game \"%s\"." % " ".join(command[1:]))
         return True
     elif check_command("load"):
-        Player.load_game(command[1:])
-        Env.load_game(command[1:])
-        print("You have loaded the save game %s." % " ".join(command[1:]))
+        Player.save_game("temp001")
+        if Player.load_game(command[1:]):
+            Env.save_game("temp001")
+            if Env.load_game(command[1:]):
+                print("You have loaded the save game \"%s\"." % " ".join(command[1:]))
+            else:
+                Env.load_game("temp001")
+                print("Failed to load ENV of save game \"%s\"." % " ".join(command[1:]))
+        else:
+            Player.load_game("temp001")
+            print("Failed to load PLAYER of save game \"%s\"." % " ".join(command[1:]))
         return True
     # Whatever I need to speed up testing
     elif check_command("debug"):
