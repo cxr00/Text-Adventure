@@ -1,5 +1,5 @@
 from enums import *
-from states import Env
+from env import Env
 from player import Player
 from words import Words, GameText
 
@@ -29,7 +29,7 @@ def check_command(*args):
 
     def arg_matches_command(n):
         # Synonym engine
-        # Returns True if there is at least one match
+        # Returns False if there is not at least one match
         if isinstance(args[n], list):
             if not command[n] in args[n]:
                 return False
@@ -37,6 +37,7 @@ def check_command(*args):
             return False
         return True
 
+    # If the command is not at least as long as the args, it is obviously False
     if len(command) < len(args):
         return False
 
@@ -73,6 +74,8 @@ def go(*loc):
 def look(args):
     if check_command("look"):
         n = 2 if command[1] == "at" else 1
+        # Synonym engine
+        # Returns False if there is not at least one match
         if isinstance(args, list):
             if not command[n] in args:
                 return False
@@ -124,7 +127,7 @@ def inventory_check():
             return True
         elif check_command("drink", "soda"):
             Player.take_item(Item.SODA)
-            Player.DRANK_PEPSI = True
+            Player.DRANK_SODA = True
             print("You drink the soda. Scrumptch!")
             Player.give_item(Item.SODA_CAN)
             print("You are left with the soda CAN.")
@@ -192,12 +195,22 @@ def misc_check():
         Player.reset()
         Env.reset()
         return True
+    elif check_command("save"):
+        Player.save_game(command[1:])
+        Env.save_game(command[1:])
+        print("You have saved the game %s." % " ".join(command[1:]))
+        return True
+    elif check_command("load"):
+        Player.load_game(command[1:])
+        Env.load_game(command[1:])
+        print("You have loaded the save game %s." % " ".join(command[1:]))
+        return True
     # Whatever I need to speed up testing
     elif check_command("debug"):
-        Player.give_credits(30)
-        Player.give_item(Item.TRASH)
-        Player.give_item(Item.WIDGET)
-        Player.change_room(Room.KITCHEN)
+        Player.give_item(Item.BANANA_PEEL)
+        Env.Kitchen.WRAPPER_IN_TRASH = True
+        Env.Kitchen.CAN_IN_TRASH = True
+        Player.change_room(Room.TRASH_CAN)
         return True
 
     return False
@@ -241,7 +254,7 @@ def bedroom():
         if look_around("bedroom"):
             print("It is your bedroom.")
             print("The door to your bathroom is open.")
-            print("The door to your kitchen is also open.\n")
+            print("The door to your kitchen is also open.")
             return True
         elif look("floor"):
             print("There is nothing on the floor.")

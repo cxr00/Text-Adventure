@@ -14,6 +14,15 @@ class Room(Enum):
     OUTSIDE = "outside"
     CELLAR = "cellar"
 
+    NULL_ROOM = "null room"
+
+    @staticmethod
+    def get(s):
+        for room in Room:
+            if room.value == s:
+                return room
+        return Room.NULL_ROOM
+
 
 # The set of items which may appear in the player's inventory
 class Item(Enum):
@@ -33,7 +42,25 @@ class Item(Enum):
 
     CELLAR_KEY = "cellar key"
 
+    NULL_ITEM = "null item"
+
+    @staticmethod
+    def get(s):
+        for item in Item:
+            if item.value == s:
+                return item
+        return Item.NULL_ITEM
+
 
 # The set of charms which may appear in the player's charm box
 class Charm(Enum):
     GENERATE = "generate"
+
+    NULL_CHARM = "null charm"
+
+    @staticmethod
+    def get(s):
+        for charm in Charm:
+            if charm.value == s:
+                return charm
+        return Charm.NULL_CHARM

@@ -1,4 +1,5 @@
-from enums import Room
+from enums import Room, Charm, Item
+import shelve
 
 
 class Player:
@@ -13,7 +14,7 @@ class Player:
     # Poop conditions
     EATEN_BURRITO = False
     EATEN_BANANA = False
-    DRANK_PEPSI = False
+    DRANK_SODA = False
     NEEDS_TO_POOP = False
     HAS_POOPED = False
 
@@ -31,7 +32,7 @@ class Player:
         # Poop conditions
         Player.EATEN_BURRITO = False
         Player.EATEN_BANANA = False
-        Player.DRANK_PEPSI = False
+        Player.DRANK_SODA = False
         Player.NEEDS_TO_POOP = False
         Player.HAS_POOPED = False
 
@@ -40,9 +41,45 @@ class Player:
         print("You have been reset.")
 
     @staticmethod
+    def save_game(file_string):
+        with shelve.open("_".join(file_string) + "_player") as db:
+            db["credits"] = Player.credits
+            db["inventory"] = [i.value for i in Player.inventory]
+            db["charms"] = [c.value for c in Player.charms]
+            db["location"] = Player.location.value
+
+            db["eaten burrito"] = Player.EATEN_BURRITO
+            db["eaten banana"] = Player.EATEN_BANANA
+            db["drank soda"] = Player.DRANK_SODA
+            db["needs to poop"] = Player.NEEDS_TO_POOP
+            db["has pooped"] = Player.HAS_POOPED
+
+            db["has illegal currency"] = Player.HAS_ILLEGAL_CURRENCY
+
+    @staticmethod
+    def load_game(file_string):
+        with shelve.open("_".join(file_string) + "_player") as db:
+            Player.credits = int(db["credits"])
+
+            inventory = db["inventory"]
+            Player.inventory = [Item.get(i) for i in inventory]
+
+            charms = db["charms"]
+            Player.charms = [Charm.get(c) for c in charms]
+
+            Player.location = Room.get(db["location"])
+            Player.EATEN_BURRITO = bool(db["eaten burrito"])
+            Player.EATEN_BANANA = bool(db["eaten banana"])
+            Player.DRANK_SODA = bool(db["drank soda"])
+            Player.NEEDS_TO_POOP = bool(db["needs to poop"])
+            Player.HAS_POOPED = bool(db["has pooped"])
+
+            Player.HAS_ILLEGAL_CURRENCY = bool(db["has illegal currency"])
+
+    @staticmethod
     def needs_to_poop():
         # Determines whether the player needs to use the toilet
-        Player.NEEDS_TO_POOP = Player.EATEN_BURRITO and Player.EATEN_BANANA and Player.DRANK_PEPSI
+        Player.NEEDS_TO_POOP = Player.EATEN_BURRITO and Player.EATEN_BANANA and Player.DRANK_SODA
         return Player.NEEDS_TO_POOP
 
     @staticmethod
