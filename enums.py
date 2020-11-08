@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 # The set of rooms and room-like states
@@ -14,14 +14,15 @@ class Room(Enum):
     OUTSIDE = "outside"
     CELLAR = "cellar"
 
-    NULL_ROOM = "null room"
+    DEBUG = "debug"
+    NULL = "null"
 
     @staticmethod
     def get(s):
         for room in Room:
             if room.value == s:
                 return room
-        return Room.NULL_ROOM
+        return Room.NULL
 
 
 # The set of items which may appear in the player's inventory
@@ -32,7 +33,7 @@ class Item(Enum):
     BURRITO_WRAPPER = "burrito wrapper"
 
     BANANA = "banana"
-    PEELED_BANANA = "peeled banana"
+    PEELED_BANANA = "banana (peeled)"
     BANANA_PEEL = "banana peel"
 
     SODA = "soda"
@@ -42,25 +43,28 @@ class Item(Enum):
 
     CELLAR_KEY = "cellar key"
 
-    NULL_ITEM = "null item"
+    DEBUG = "debug"
+    NULL = "null"
 
     @staticmethod
     def get(s):
         for item in Item:
             if item.value == s:
                 return item
-        return Item.NULL_ITEM
+        return Item.NULL
 
 
 # The set of charms which may appear in the player's charm box
 class Charm(Enum):
     GENERATE = "generate"
 
-    NULL_CHARM = "null charm"
+    DEBUG = "debug"
+
+    NULL = "null"
 
     @staticmethod
     def get(s):
         for charm in Charm:
             if charm.value == s:
                 return charm
-        return Charm.NULL_CHARM
+        return Charm.NULL

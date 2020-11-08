@@ -1,6 +1,6 @@
 from enums import *
+from player import Player, view_save_files
 from env import Env
-from player import Player
 from words import Words, GameText
 
 
@@ -8,18 +8,18 @@ ROOMS = {}
 DESC = {}
 
 end = False
-command = []
+cmd = []
 
 
-def get_command():
+def get_cmd():
     """
     Takes input and converts it into an array command
     """
-    global command
-    command = [e.lower() for e in input(">>> ").split(" ")]
+    global cmd
+    cmd = [e.lower() for e in input(">>> ").split(" ")]
 
 
-def check_command(*args):
+def check_cmd(*args):
     """
     Determines if command matches args
 
@@ -27,23 +27,23 @@ def check_command(*args):
     :return: Whether args matches command
     """
 
-    def arg_matches_command(n):
+    def arg_matches_cmd(n):
         # Synonym engine
         # Returns False if there is not at least one match
         if isinstance(args[n], list):
-            if not command[n] in args[n]:
+            if not cmd[n] in args[n]:
                 return False
-        elif command[n] != args[n].lower():
+        elif cmd[n] != args[n].lower():
             return False
         return True
 
     # If the command is not at least as long as the args, it is obviously False
-    if len(command) < len(args):
+    if len(cmd) < len(args):
         return False
 
     n = 0
     while n < len(args):
-        if not arg_matches_command(n):
+        if not arg_matches_cmd(n):
             return False
         n += 1
 
@@ -55,16 +55,16 @@ def go(*loc):
     Changes room based on given loc as long as the command starts with 'go' or 'go to'
     :param loc: The possible locations to travel and their associated commands
     """
-    if check_command("go"):
-        n = 2 if command[1] == "to" else 1
+    if check_cmd("go"):
+        n = 2 if cmd[1] == "to" else 1
         for e in loc:
             # Synonym engine
             # Returns True if there is at least one match
             if isinstance(e[0], list):
-                if command[n] in e[0]:
+                if cmd[n] in e[0]:
                     Player.change_room(e[1])
                     return True
-            elif command[n] == e[0]:
+            elif cmd[n] == e[0]:
                 Player.change_room(e[1])
                 return True
     return False
@@ -72,14 +72,14 @@ def go(*loc):
 
 # For viewing things which have properties which can be viewed
 def look(args):
-    if check_command("look"):
-        n = 2 if command[1] == "at" else 1
+    if check_cmd("look"):
+        n = 2 if cmd[1] == "at" else 1
         # Synonym engine
         # Returns False if there is not at least one match
         if isinstance(args, list):
-            if not command[n] in args:
+            if not cmd[n] in args:
                 return False
-        elif command[n] != args:
+        elif cmd[n] != args:
             return False
         return True
     return False
@@ -87,7 +87,7 @@ def look(args):
 
 # For viewing information about the current room
 def look_around(s):
-    return check_command("look", "around") or look(s)
+    return check_cmd("look", "around") or look(s)
 
 
 # All commands associated with items in the player's inventory
@@ -97,22 +97,22 @@ def inventory_check():
         if Player.needs_to_poop():
             print("Your tummy gurgles. Probably need a bathroom.")
 
-    if Item.WIDGET in Player.inventory:
+    if Player.has_item(Item.WIDGET):
         if look("widget"):
             print("It is a widget. Fascinating. You can PROCESS this.")
             return True
-        elif check_command("process", "widget"):
+        elif check_cmd("process", "widget"):
             Player.give_credits(8)
             Player.take_item(Item.WIDGET)
             Player.HAS_ILLEGAL_CURRENCY = True
             print("You process the widget. You earn 8 credits!")
             return True
 
-    if Item.BURRITO in Player.inventory:
+    if Player.has_item(Item.BURRITO):
         if look("burrito"):
             print("A burrito from the vendor.")
             return True
-        elif check_command("eat", "burrito"):
+        elif check_cmd("eat", "burrito"):
             Player.take_item(Item.BURRITO)
             Player.EATEN_BURRITO = True
             print("You eat the burrito. Scrumptch!")
@@ -121,11 +121,11 @@ def inventory_check():
             check_need_to_poop()
             return True
 
-    if Item.SODA in Player.inventory:
+    if Player.has_item(Item.SODA):
         if look("soda"):
             print("A pepsi from the vendor.")
             return True
-        elif check_command("drink", "soda"):
+        elif check_cmd("drink", "soda"):
             Player.take_item(Item.SODA)
             Player.DRANK_SODA = True
             print("You drink the soda. Scrumptch!")
@@ -134,23 +134,23 @@ def inventory_check():
             check_need_to_poop()
             return True
 
-    if Item.BANANA in Player.inventory or Item.PEELED_BANANA in Player.inventory:
+    if Player.has_item([Item.BANANA, Item.PEELED_BANANA]):
         if look("banana"):
             print("A banana from the vendor.")
-            if Item.BANANA in Player.inventory:
+            if Player.has_item(Item.BANANA):
                 print("I need to PEEL it.")
             return True
-        elif check_command("eat", "banana"):
-            if Item.PEELED_BANANA in Player.inventory:
+        elif check_cmd("eat", "banana"):
+            if Player.has_item(Item.PEELED_BANANA):
                 Player.take_item(Item.PEELED_BANANA)
                 Player.EATEN_BANANA = True
                 print("You eat the banana. Scrumptch!")
                 check_need_to_poop()
                 return True
-            elif Item.BANANA in Player.inventory:
+            elif Player.has_item(Item.BANANA):
                 print("You need to PEEL it first.")
                 return True
-        elif check_command("peel", "banana"):
+        elif check_cmd("peel", "banana"):
             Player.take_item(Item.BANANA)
             Player.give_item(Item.PEELED_BANANA)
             Player.give_item(Item.BANANA_PEEL)
@@ -163,9 +163,9 @@ def inventory_check():
 
 # All commands associated with the charms in the player's possession
 def charm_check():
-    if Charm.GENERATE in Player.charms:
-        if check_command("generate"):
-            if Item.WIDGET not in Player.inventory:
+    if Player.has_charm(Charm.GENERATE):
+        if check_cmd("generate"):
+            if not Player.has_item(Item.WIDGET):
                 Player.give_item(Item.WIDGET)
                 print("You generate a widget.")
             else:
@@ -177,7 +177,7 @@ def charm_check():
 
 # Additional utility commands
 def misc_check():
-    if check_command("credits") or look("credits") or check_command("check", "credits"):
+    if check_cmd("credits") or look("credits") or check_cmd("check", "credits"):
         print("You have %s credits." % Player.credits)
         return True
     elif look(["inventory", "items"]):
@@ -191,34 +191,43 @@ def misc_check():
             print(e.value)
         return True
 
-    elif check_command("reset"):
+    # META COMMANDS
+    elif check_cmd("reset"):
         Player.reset()
         Env.reset()
         return True
-    elif check_command("save"):
-        Player.save_game(command[1:])
-        Env.save_game(command[1:])
-        print("You have saved the game \"%s\"." % " ".join(command[1:]))
+    elif check_cmd("save"):
+        Player.save_game(cmd[1:])
+        Env.save_game(cmd[1:])
+        print("You have saved the game \"%s\"." % " ".join(cmd[1:]))
         return True
-    elif check_command("load"):
+    elif check_cmd("load"):
         Player.save_game("temp001")
-        if Player.load_game(command[1:]):
+        if Player.load_game(cmd[1:]):
             Env.save_game("temp001")
-            if Env.load_game(command[1:]):
-                print("You have loaded the save game \"%s\"." % " ".join(command[1:]))
+            if Env.load_game(cmd[1:]):
+                print("You have loaded the save game \"%s\"." % " ".join(cmd[1:]))
             else:
                 Env.load_game("temp001")
-                print("Failed to load ENV of save game \"%s\"." % " ".join(command[1:]))
+                print("Failed to load ENV of save game \"%s\"." % " ".join(cmd[1:]))
         else:
             Player.load_game("temp001")
-            print("Failed to load PLAYER of save game \"%s\"." % " ".join(command[1:]))
+            print("Failed to load PLAYER of save game \"%s\"." % " ".join(cmd[1:]))
         return True
+    elif check_cmd(["view", "look"], ["save", "saves"]):
+        view_save_files()
+        return True
+    elif check_cmd(["quit", "exit"]):
+        really_quit = input("Are you sure you want to quit? (y/n)\n>>> ")
+        if really_quit[0] == "y":
+            exit(0)
+        else:
+            return True
     # Whatever I need to speed up testing
-    elif check_command("debug"):
-        Player.give_item(Item.BANANA_PEEL)
-        Env.Kitchen.WRAPPER_IN_TRASH = True
-        Env.Kitchen.CAN_IN_TRASH = True
-        Player.change_room(Room.TRASH_CAN)
+    elif check_cmd("debug") and Player.DEBUG:
+        Player.change_room(Room.OUTSIDE)
+        Player.give_charm(Charm.DEBUG)
+        Player.give_item(Item.PEELED_BANANA)
         return True
 
     return False
@@ -232,7 +241,7 @@ def register_room(room, description):
     def universal_check(f):
 
         def wrapper():
-            get_command()
+            get_cmd()
             if inventory_check():
                 pass
             elif charm_check():
@@ -240,7 +249,7 @@ def register_room(room, description):
             elif misc_check():
                 pass
             elif not f():
-                print("I don't understand \"%s\"." % " ".join(command))
+                print("I don't understand \"%s\"." % " ".join(cmd))
 
         return wrapper
 
@@ -288,11 +297,11 @@ def bathroom():
             else:
                 print("There is nothing on the floor.")
             return True
-        elif check_command("sit", "toilet"):
+        elif check_cmd("sit", "toilet"):
             Env.Bathroom.SITTING_ON_TOILET = True
             print("You sit on the toilet.")
             return True
-        elif check_command(Words.TAKE, "key"):
+        elif check_cmd(Words.TAKE, "key"):
             if Env.Bathroom.KEY_ON_FLOOR:
                 Player.give_item(Item.CELLAR_KEY)
                 Env.Bathroom.KEY_ON_FLOOR = False
@@ -301,7 +310,7 @@ def bathroom():
                 print("There is nothing on the floor.")
             return True
     else:
-        if check_command(["poop", "shit"]) or check_command("take", ["dump", "shit"]):
+        if check_cmd(["poop", "shit"]) or check_cmd("take", ["dump", "shit"]):
             if Player.NEEDS_TO_POOP:
                 Player.NEEDS_TO_POOP = False
                 Player.HAS_POOPED = True
@@ -309,7 +318,7 @@ def bathroom():
             else:
                 print("You don't need to do that right now.")
             return True
-        elif check_command("stand"):
+        elif check_cmd("stand"):
             Env.Bathroom.SITTING_ON_TOILET = False
             print("You get off the toilet.")
             return True
@@ -347,7 +356,7 @@ def kitchen():
         elif look("floor"):
             print("There is nothing on the floor.")
             return True
-        elif check_command(["look", "use"], "trash") or check_command("throw", "away", "trash"):
+        elif check_cmd(["look", "use"], "trash") or check_cmd("throw", "away", "trash"):
             Player.change_room(Room.TRASH_CAN)
             return True
 
@@ -378,11 +387,11 @@ def vendor():
             print("You cannot afford the %s." % item.value)
         return True
 
-    if check_command("buy", "burrito"):
+    if check_cmd("buy", "burrito"):
         return buy(Item.BURRITO)
-    elif check_command("buy", "banana"):
+    elif check_cmd("buy", "banana"):
         return buy(Item.BANANA)
-    elif check_command("buy", "soda"):
+    elif check_cmd("buy", "soda"):
         return buy(Item.SODA)
 
     if look_around("vendor"):
@@ -390,7 +399,7 @@ def vendor():
         print("Remember: Illegal Currency is Illegal.")
         print("The vendor contains: BURRITO, BANANA, and SODA.")
         return True
-    if check_command("leave") or check_command("go", "kitchen"):
+    if check_cmd("leave") or check_cmd("go", "kitchen"):
         Player.change_room(Room.KITCHEN)
         return True
 
@@ -406,12 +415,12 @@ def monetizor():
         print("There is a sticker on the side of the monetizor which reads:")
         print("INSERT contraband for a credit reward.")
         return True
-    elif check_command("leave"):
+    elif check_cmd("leave"):
         Player.change_room(Room.KITCHEN)
         return True
 
-    if Charm.GENERATE in Player.charms:
-        if check_command(Words.INSERT, ["charm", "generate"]):
+    if Player.has_charm(Charm.GENERATE):
+        if check_cmd(Words.INSERT, ["charm", "generate"]):
             Player.give_credits(50)
             Player.take_charm(Charm.GENERATE)
             print("You put the generate charm into the monetizor.")
@@ -419,8 +428,8 @@ def monetizor():
             Player.change_room(Room.KITCHEN)
             return True
 
-    if Item.WIDGET in Player.inventory:
-        if check_command(Words.INSERT, "widget"):
+    if Player.has_item(Item.WIDGET):
+        if check_cmd(Words.INSERT, "widget"):
             Player.give_credits(5)
             Player.take_item(Item.WIDGET)
             Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = True
@@ -446,7 +455,7 @@ def trash_can():
 
     if go(("kitchen", Room.KITCHEN)):
         return True
-    elif check_command("leave"):
+    elif check_cmd("leave"):
         Player.change_room(Room.KITCHEN)
         return True
     elif look_around("trash"):
@@ -458,7 +467,7 @@ def trash_can():
         else:
             print("There's still a bit of room in the trash can.")
         return True
-    elif check_command(Words.TAKE, "trash") and Env.trash_is_full() and not Env.Kitchen.TRASH_TAKEN:
+    elif check_cmd(Words.TAKE, "trash") and Env.trash_is_full() and not Env.Kitchen.TRASH_TAKEN:
         Player.give_item(Item.TRASH)
         Env.Kitchen.TRASH_TAKEN = True
         print("You take the TRASH bag out of the can.")
@@ -467,21 +476,21 @@ def trash_can():
         return True
 
     if Item.BURRITO_WRAPPER in Player.inventory:
-        if check_command("toss", "wrapper") or check_command("throw", "away", "wrapper"):
+        if check_cmd("toss", "wrapper") or check_cmd("throw", "away", "wrapper"):
             Player.take_item(Item.BURRITO_WRAPPER)
             Env.Kitchen.WRAPPER_IN_TRASH = True
             print("You throw away the burrito wrapper.")
             check_trash_is_full()
             return True
     if Item.BANANA_PEEL in Player.inventory:
-        if check_command("toss", "peel") or check_command("throw", "away", "peel"):
+        if check_cmd("toss", "peel") or check_cmd("throw", "away", "peel"):
             Player.take_item(Item.BANANA_PEEL)
             Env.Kitchen.PEEL_IN_TRASH = True
             print("You throw away the banana peel.")
             check_trash_is_full()
             return True
     if Item.SODA_CAN in Player.inventory:
-        if check_command("toss", "can") or check_command("throw", "away", "can"):
+        if check_cmd("toss", "can") or check_cmd("throw", "away", "can"):
             Player.take_item(Item.SODA_CAN)
             Env.Kitchen.CAN_IN_TRASH = True
             print("You throw away the soda can.")
@@ -493,7 +502,7 @@ def trash_can():
 
 @register_room(Room.OUTSIDE, GameText.RoomDescriptions.outside)
 def outside():
-    if go((["inside", "in", "kitchen"], Room.KITCHEN)):
+    if go((["inside", "in", "kitchen"], Room.KITCHEN), (["portal", "nether"], Room.DEBUG)):
         return True
     else:
         if look_around("outside"):
@@ -502,11 +511,12 @@ def outside():
             if Env.Outside.TRASH_IN_BIN:
                 print("The trash is in the bin.")
             print("The CELLAR is on your right.")
+            print("A strange PORTAL to the NETHER is also present for some reason.")
             return True
         elif look(["floor", "ground"]):
             print("There is nothing on the ground.")
             return True
-        elif check_command("go", "cellar") or check_command("go", "to", "cellar"):
+        elif check_cmd("go", "cellar") or check_cmd("go", "to", "cellar"):
             if Env.Outside.CELLAR_DOOR_LOCKED:
                 if Item.CELLAR_KEY in Player.inventory:
                     Env.Outside.CELLAR_DOOR_LOCKED = False
@@ -520,14 +530,14 @@ def outside():
             return True
 
         if Item.TRASH in Player.inventory:
-            if check_command("toss", "trash") or check_command("throw", "away", "trash"):
+            if check_cmd("toss", "trash") or check_cmd("throw", "away", "trash"):
                 Player.take_item(Item.TRASH)
                 Env.Outside.TRASH_IN_BIN = True
                 print("You throw away the trash in the bin. Chores done!")
                 return True
 
         if Item.CELLAR_KEY in Player.inventory:
-            if check_command("use", "key") or check_command("unlock", "cellar") and Env.Outside.CELLAR_DOOR_LOCKED:
+            if check_cmd("use", "key") or check_cmd("unlock", "cellar") and Env.Outside.CELLAR_DOOR_LOCKED:
                 Env.Outside.CELLAR_DOOR_LOCKED = False
                 print("You unlock the cellar door with the key.")
                 return True
@@ -545,13 +555,42 @@ def cellar():
             if Env.Cellar.CHARM_ON_TABLE:
                 print("There is some sort of CHARM on an end table.")
             return True
-        elif check_command(Words.TAKE, "charm") and Env.Cellar.CHARM_ON_TABLE:
+        elif check_cmd(Words.TAKE, "charm") and Env.Cellar.CHARM_ON_TABLE:
             Player.give_charm(Charm.GENERATE)
             Env.Cellar.CHARM_ON_TABLE = False
             print("You take the GENERATE charm from the table.")
             return True
 
     return False
+
+
+@register_room(Room.DEBUG, GameText.RoomDescriptions.test_room)
+def test_room():
+    if go((["away", "out", "portal", "outside"], Room.OUTSIDE)):
+        return True
+    elif look_around(["room", "area", "nether"]):
+        print("You are in a very nether-y place.")
+        print("You don't know why you went through the portal to begin with.")
+        if Env.Debug.PLUNGUS_DECANTIFIED:
+            print("The plungus has been decantified.")
+        return True
+    elif look("floor"):
+        print("There are windy, curly mushrooms growing all over.")
+        print("You don't want to touch any of them.")
+        return True
+    elif check_cmd("use", "debug") and Player.DEBUG:
+        if Player.has_charm(Charm.DEBUG) and not Env.Debug.PLUNGUS_DECANTIFIED:
+            Env.Debug.PLUNGUS_DECANTIFIED = True
+            print("You employ the debug charm's powers to decantify the plungus.")
+        else:
+            print("You have no debug charm to use.")
+        return True
+    elif check_cmd("check", ["state", "plungus"]):
+        if Env.Debug.PLUNGUS_DECANTIFIED:
+            print("The plungus is decantified.")
+        else:
+            print("The plungus is NOT decantified.")
+        return True
 
 
 def run_game():

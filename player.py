@@ -3,16 +3,28 @@ import shelve
 import os
 
 
-def check_for_save_folder():
+def check_for_save_folder(fs=""):
     if not os.path.exists("saves"):
         os.mkdir("saves")
+    if not os.path.exists("saves/" + fs):
+        os.mkdir("saves/" + fs)
 
 
 def join_file_string(fs):
-    if isinstance(fs, list):
-        return "_".join(fs) + "_player"
-    else:
-        return fs + "_player"
+    return "_".join(fs) if isinstance(fs, list) else fs
+
+
+def view_save_files():
+    check_for_save_folder()
+    l = os.listdir("saves/")
+    out = []
+    for each in l:
+        name = " ".join(each.split("_"))
+        if name not in out and name != "temp001":
+            out.append(name)
+    print("SAVE FILES:")
+    for each in out:
+        print(each)
 
 
 class Player:
@@ -33,6 +45,8 @@ class Player:
 
     HAS_ILLEGAL_CURRENCY = False
 
+    DEBUG = True
+
     @staticmethod
     def reset():
         # Player variables
@@ -51,13 +65,17 @@ class Player:
 
         Player.HAS_ILLEGAL_CURRENCY = False
 
+        Player.DEBUG = True
+
         print("You have been reset.")
 
     @staticmethod
     def save_game(file_string):
         check_for_save_folder()
         file_string = join_file_string(file_string)
-        with shelve.open("saves/" + file_string) as db:
+        check_for_save_folder(file_string)
+
+        with shelve.open("saves/" + file_string + "/player") as db:
             db["credits"] = Player.credits
             db["inventory"] = [i.value for i in Player.inventory]
             db["charms"] = [c.value for c in Player.charms]
@@ -71,13 +89,16 @@ class Player:
 
             db["has illegal currency"] = Player.HAS_ILLEGAL_CURRENCY
 
+            db["test state"] = Player.DEBUG
+
     @staticmethod
     def load_game(file_string):
         check_for_save_folder()
         file_string = join_file_string(file_string)
+        check_for_save_folder(file_string)
 
-        if os.path.exists("saves/" + file_string + ".dat"):
-            with shelve.open("saves/" + file_string) as db:
+        if os.path.exists("saves/" + file_string + "/player.dat"):
+            with shelve.open("saves/" + file_string + "/player") as db:
                 Player.credits = int(db["credits"])
 
                 inventory = db["inventory"]
@@ -94,6 +115,8 @@ class Player:
                 Player.HAS_POOPED = bool(db["has pooped"])
 
                 Player.HAS_ILLEGAL_CURRENCY = bool(db["has illegal currency"])
+
+                Player.DEBUG = bool(db["test state"])
             return True
         else:
             print("Save file %s does not exist." % file_string)
@@ -138,3 +161,21 @@ class Player:
     def take_credits(amount):
         # Take an amount of credits from your possession
         Player.credits -= amount
+
+    @staticmethod
+    def has_item(item):
+        if isinstance(item, list):
+            for e in item:
+                if e in Player.inventory:
+                    return True
+            return False
+        return item in Player.inventory
+
+    @staticmethod
+    def has_charm(charm):
+        if isinstance(charm, list):
+            for e in charm:
+                if e in Player.charms:
+                    return True
+            return False
+        return charm in Player.charms

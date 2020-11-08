@@ -2,6 +2,10 @@ import shelve
 import os
 
 
+def join_file_string(fs):
+    return "_".join(fs) if isinstance(fs, list) else fs
+
+
 class Env:
 
     class Universal:
@@ -14,7 +18,10 @@ class Env:
             Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = False
 
     class Bedroom:
-        pass
+
+        @staticmethod
+        def reset():
+            pass
 
     class Bathroom:
         SITTING_ON_TOILET = False
@@ -56,6 +63,13 @@ class Env:
         def reset():
             Env.Cellar.CHARM_ON_TABLE = True
 
+    class Debug:
+        PLUNGUS_DECANTIFIED = False
+
+        @staticmethod
+        def reset():
+            Env.Debug.PLUNGUS_DECANTIFIED = False
+
     @staticmethod
     def trash_is_full():
         Env.Kitchen.TRASH_FULL = Env.Kitchen.WRAPPER_IN_TRASH and Env.Kitchen.PEEL_IN_TRASH and Env.Kitchen.CAN_IN_TRASH
@@ -64,18 +78,19 @@ class Env:
     @staticmethod
     def reset():
         Env.Universal.reset()
+
+        Env.Bedroom.reset()
         Env.Bathroom.reset()
         Env.Kitchen.reset()
         Env.Outside.reset()
         Env.Cellar.reset()
 
+        Env.Debug.reset()
+
     @staticmethod
     def save_game(file_string):
-        if isinstance(file_string, list):
-            file_string = "_".join(file_string) + "_env"
-        else:
-            file_string = file_string + "_env"
-        with shelve.open("saves/" + file_string) as db:
+        file_string = join_file_string(file_string)
+        with shelve.open("saves/" + file_string + "/env") as db:
             db["univ illegal currency discovered"] = Env.Universal.ILLEGAL_CURRENCY_DISCOVERED
             db["univ super illegal item discovered"] = Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED
 
@@ -90,15 +105,14 @@ class Env:
 
             db["cellar charm on table"] = Env.Cellar.CHARM_ON_TABLE
 
+            db["debug plungus decantified"] = Env.Debug.PLUNGUS_DECANTIFIED
+
     @staticmethod
     def load_game(file_string):
-        if isinstance(file_string, list):
-            file_string = "_".join(file_string) + "_env"
-        else:
-            file_string = file_string + "_env"
+        file_string = join_file_string(file_string)
 
-        if os.path.exists("saves/" + file_string + ".dat"):
-            with shelve.open("saves/" + file_string) as db:
+        if os.path.exists("saves/" + file_string + "/env.dat"):
+            with shelve.open("saves/" + file_string + "/env") as db:
                 Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = bool(db["univ illegal currency discovered"])
                 Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = bool(db["univ super illegal item discovered"])
 
@@ -112,6 +126,8 @@ class Env:
                 Env.Kitchen.TRASH_TAKEN = db["kitchen trash taken"]
 
                 Env.Cellar.CHARM_ON_TABLE = bool(db["cellar charm on table"])
+
+                Env.Debug.PLUNGUS_DECANTIFIED = bool(db["debug plungus decantified"])
             return True
         else:
             print("Save file %s does not exist" % "_".join(file_string))
