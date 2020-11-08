@@ -1,11 +1,11 @@
 
 
 class MaterialRecipe:
-    CIRCUIT_BOARD = (("glass", 2), ("plastic", 2), ("copper wire", 1))
-    CABLE = (("copper wire", 3), ("plastic", 2))
-    MICROCHIP = (("scrap metal", 2), ("plastic", 2), ("glass", 2))
-    CAPACITOR = (("scrap metal", 2), ("copper wire", 1), ("glass", 1))
-    CASING = (("scrap metal", 4), ("plastic", 2), ("glass", 1))
+    CIRCUIT_BOARD = (("glass", 1), ("plastic", 1), ("copper wire", 1))
+    CABLE = (("copper wire", 2), ("plastic", 1))
+    MICROCHIP = (("scrap metal", 1), ("plastic", 1), ("glass", 1))
+    CAPACITOR = (("scrap metal", 1), ("copper wire", 1), ("glass", 1))
+    CASING = (("scrap metal", 2), ("plastic", 1), ("glass", 1))
 
 
 class ComponentRecipe:

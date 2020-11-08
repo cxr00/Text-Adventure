@@ -5,16 +5,16 @@ from random import randint
 
 cmd = []
 inventory = {
-    "glass": 2,
+    "glass": 0,
     "scrap metal": 0,
-    "plastic": 2,
-    "copper wire": 2,
+    "plastic": 0,
+    "copper wire": 0,
 
-    "circuit board": 1,
-    "cable": 2,
-    "microchip": 0,
-    "capacitor": 0,
-    "casing": 1,
+    "circuit board": 100,
+    "cable": 100,
+    "microchip": 100,
+    "capacitor": 100,
+    "casing": 100,
 
     "psu": 0,
     "motherboard": 0,
@@ -34,7 +34,7 @@ def view_inventory():
 
 
 # Returns True if recipe make is successful
-def make(item_name, recipe):
+def craft(item_name, recipe):
     global inventory
 
     # Check that all materials are present in inventory
@@ -42,11 +42,14 @@ def make(item_name, recipe):
         if inventory[each[0]] >= each[1]:
             pass
         else:
+            print("You do not have sufficient materials to craft this.")
             return False
 
     # Remove items from player's inventory
     for each in recipe:
         inventory[each[0]] -= each[1]
+
+    print("You craft a %s" % item_name)
 
     inventory[item_name] += 1
 
@@ -140,12 +143,107 @@ def at_machine():
 
 # Craft ingredients into materials
 def at_workbench():
+    if check_cmd("craft") and len(cmd) == 1:
+        print("CIRCUIT BOARD: " + str(MaterialRecipe.CIRCUIT_BOARD))
+        print("CABLE: " + str(MaterialRecipe.CABLE))
+        print("MICROCHIP: " + str(MaterialRecipe.MICROCHIP))
+        print("CAPACITOR: " + str(MaterialRecipe.CAPACITOR))
+        print("CASING: " + str(MaterialRecipe.CASING))
+        return True
+    elif check_cmd("craft", "circuit", "board"):
+        craft("circuit board", MaterialRecipe.CIRCUIT_BOARD)
+        return True
+    elif check_cmd("craft", "cable"):
+        craft("cable", MaterialRecipe.CABLE)
+        return True
+    elif check_cmd("craft", "microchip"):
+        craft("microchip", MaterialRecipe.MICROCHIP)
+        return True
+    elif check_cmd("craft", "capacitor"):
+        craft("capacitor", MaterialRecipe.CAPACITOR)
+        return True
+    elif check_cmd("craft", "casing"):
+        craft("casing", MaterialRecipe.CASING)
+        return True
+
     return False
 
 
 # Build materials into components
 # Place the components into the computer
 def at_computer():
+    if check_cmd(["look", "view", "check"], "computer"):
+        if not Computer.PSU:
+            print("The PSU is missing.")
+        if not Computer.MOTHERBOARD:
+            print("The MOTHERBOARD is missing.")
+        if not Computer.PROCESSOR:
+            print("The PROCESSOR is missing.")
+        if not Computer.GRAPHICS_CARD:
+            print("The GRAPHICS CARD is missing.")
+        if not Computer.HARD_DRIVE:
+            print("The HARD DRIVE is missing.")
+        if not Computer.SOLID_STATE_DRIVE:
+            print("The SOLID STATE DRIVE is missing.")
+        if not Computer.RAM:
+            print("The RAM is missing.")
+        return True
+
+    elif check_cmd("craft") and len(cmd) == 1:
+        print("PSU: " + str(ComponentRecipe.PSU))
+        print("MOTHERBOARD: " + str(ComponentRecipe.MOTHERBOARD))
+        print("PROCESSOR: " + str(ComponentRecipe.PROCESSOR))
+        print("GRAPHICS CARD: " + str(ComponentRecipe.GRAPHICS_CARD))
+        print("HARD DRIVE: " + str(ComponentRecipe.HARD_DRIVE))
+        print("SOLID STATE DRIVE: " + str(ComponentRecipe.SOLID_STATE_DRIVE))
+        print("RAM: " + str(ComponentRecipe.RAM))
+        return True
+    elif check_cmd("craft", "psu"):
+        craft("psu", ComponentRecipe.PSU)
+        return True
+    elif check_cmd("craft", "motherboard"):
+        craft("motherboard", ComponentRecipe.MOTHERBOARD)
+        return True
+    elif check_cmd("craft", "processor"):
+        craft("processor", ComponentRecipe.PROCESSOR)
+        return True
+    elif check_cmd("craft", "graphics", "card"):
+        craft("graphics card", ComponentRecipe.GRAPHICS_CARD)
+        return True
+    elif check_cmd("craft", "hard", "drive"):
+        craft("hard drive", ComponentRecipe.HARD_DRIVE)
+        return True
+    elif check_cmd("craft", "solid", "state", "drive"):
+        craft("solid state drive", ComponentRecipe.SOLID_STATE_DRIVE)
+        return True
+    elif check_cmd("craft", "ram"):
+        craft("ram", ComponentRecipe.RAM)
+        return True
+
+    elif check_cmd("fix", "computer"):
+        if not Computer.PSU and inventory["psu"] >= 1:
+            Computer.PSU = True
+            print("You install the new PSU in the computer.")
+        if not Computer.MOTHERBOARD and inventory["motherboard"] >= 1:
+            Computer.MOTHERBOARD = True
+            print("You install the new MOTHERBOARD in the computer.")
+        if not Computer.PROCESSOR and inventory["processor"] >= 1:
+            Computer.PROCESSOR = True
+            print("You install the new PROCESSOR in the computer.")
+        if not Computer.GRAPHICS_CARD and inventory["graphics card"] >= 1:
+            Computer.GRAPHICS_CARD = True
+            print("You install the new GRAPHICS CARD in the computer.")
+        if not Computer.HARD_DRIVE and inventory["hard drive"] >= 1:
+            Computer.HARD_DRIVE = True
+            print("You install the new HARD DRIVE in the computer.")
+        if not Computer.SOLID_STATE_DRIVE and inventory["solid state drive"] >= 1:
+            Computer.SOLID_STATE_DRIVE = True
+            print("You install the new SOLID STATE DRIVE in the computer.")
+        if not Computer.RAM and inventory["ram"] >= 1:
+            Computer.RAM = True
+            print("You install the new RAM in the computer.")
+        return True
+
     return False
 
 
@@ -171,7 +269,7 @@ while not end:
             valid_command = True
     elif room == Room.AT_COMPUTER:
         print("You are at the defunct computer.")
-        print("CRAFT\tMACHINE\tWORKBENCH\tINVENTORY")
+        print("CRAFT\tLOOK COMPUTER\tFIX COMPUTER\tMACHINE\tWORKBENCH\tINVENTORY")
         get_cmd()
         if not universal_check():
             valid_command = at_computer()
