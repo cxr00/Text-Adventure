@@ -73,7 +73,7 @@ def check_for_win():
 
 if check_for_win():
     print(current_levels)
-    print("YOU HAVE WON. CONGRATULATIONS.")
+    print("YOU HAVE WON! CONGRATULATIONS!")
 else:
     print(current_levels)
-    print("YOU HAVE LOST THE GAME.")
+    print("YOU HAVE LOST THE GAME!")
