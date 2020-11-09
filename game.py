@@ -228,6 +228,7 @@ def misc_check():
     # Whatever I need to speed up testing
     elif check_cmd("debug") and Player.DEBUG:
         Player.change_room(Room.CELLAR)
+        Env.ThrifTech.COMPLETE = True
         return True
 
     return False
@@ -561,11 +562,6 @@ def cellar():
                 Env.ThrifTech.REWARD_GIVEN = True
                 print("You are rewarded with a GENERATE charm.")
             return True
-        # elif check_cmd(Words.TAKE, "charm") and Env.Cellar.CHARM_ON_TABLE:
-        #     Player.give_charm(Charm.GENERATE)
-        #     Env.Cellar.CHARM_ON_TABLE = False
-        #     print("You take the GENERATE charm from the table.")
-        #     return True
 
     return False
 

@@ -10,11 +10,11 @@ inventory = {
     "plastic": 0,
     "copper wire": 0,
 
-    "circuit board": 100,
-    "cable": 100,
-    "microchip": 100,
-    "capacitor": 100,
-    "casing": 100,
+    "circuit board": 0,
+    "cable": 0,
+    "microchip": 0,
+    "capacitor": 0,
+    "casing": 0,
 
     "psu": 0,
     "motherboard": 0,
@@ -228,21 +228,27 @@ def at_computer():
             Computer.PSU = True
             print("You install the new PSU in the computer.")
         if not Computer.MOTHERBOARD and inventory["motherboard"] >= 1:
+            inventory["motherboard"] -= 1
             Computer.MOTHERBOARD = True
             print("You install the new MOTHERBOARD in the computer.")
         if not Computer.PROCESSOR and inventory["processor"] >= 1:
+            inventory["processor"] -= 1
             Computer.PROCESSOR = True
             print("You install the new PROCESSOR in the computer.")
         if not Computer.GRAPHICS_CARD and inventory["graphics card"] >= 1:
+            inventory["graphics card"] -= 1
             Computer.GRAPHICS_CARD = True
             print("You install the new GRAPHICS CARD in the computer.")
         if not Computer.HARD_DRIVE and inventory["hard drive"] >= 1:
+            inventory["hard drive"] -= 1
             Computer.HARD_DRIVE = True
             print("You install the new HARD DRIVE in the computer.")
         if not Computer.SOLID_STATE_DRIVE and inventory["solid state drive"] >= 1:
+            inventory["solid state drive"] -= 1
             Computer.SOLID_STATE_DRIVE = True
             print("You install the new SOLID STATE DRIVE in the computer.")
         if not Computer.RAM and inventory["ram"] >= 1:
+            inventory["ram"] -= 1
             Computer.RAM = True
             print("You install the new RAM in the computer.")
         return True

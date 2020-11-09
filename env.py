@@ -75,10 +75,12 @@ class Env:
 
     class ThrifTech:
         COMPLETE = False
+        REWARD_GIVEN = False
 
         @staticmethod
         def reset():
             Env.ThrifTech.COMPLETE = False
+            Env.ThrifTech.REWARD_GIVEN = False
 
     class Debug:
         PLUNGUS_DECANTIFIED = False
@@ -128,6 +130,7 @@ class Env:
             db["ratfighter points"] = Env.RatFighter.POINTS
 
             db["thriftech complete"] = Env.ThrifTech.COMPLETE
+            db["thriftech reward given"] = Env.ThrifTech.REWARD_GIVEN
 
     @staticmethod
     def load_game(file_string):
@@ -151,6 +154,7 @@ class Env:
                 Env.RatFighter.POINTS = int(db["ratfighter points"])
 
                 Env.ThrifTech.COMPLETE = bool(db["thriftech complete"])
+                Env.ThrifTech.REWARD_GIVEN = bool(db["thriftech reward given"])
             return True
         else:
             print("Save file %s does not exist" % "_".join(file_string))
