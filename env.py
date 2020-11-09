@@ -9,19 +9,29 @@ def join_file_string(fs):
 class Env:
 
     class Universal:
-        ILLEGAL_CURRENCY_DISCOVERED = False
-        SUPER_ILLEGAL_ITEM_DISCOVERED = False
+        # ILLEGAL_CURRENCY_DISCOVERED = False
+        # SUPER_ILLEGAL_ITEM_DISCOVERED = False
 
         @staticmethod
         def reset():
-            Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = False
-            Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = False
+            pass
+            # Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = False
+            # Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = False
 
     class Bedroom:
 
         @staticmethod
         def reset():
             pass
+
+    class RatFighter:
+        DISPENSED_CHARM = False
+        POINTS = 0
+
+        @staticmethod
+        def reset():
+            Env.RatFighter.DISPENSED_CHARM = False
+            Env.RatFighter.POINTS = 0
 
     class Bathroom:
         SITTING_ON_TOILET = False
@@ -63,6 +73,13 @@ class Env:
         def reset():
             Env.Cellar.CHARM_ON_TABLE = True
 
+    class ThrifTech:
+        COMPLETE = False
+
+        @staticmethod
+        def reset():
+            Env.ThrifTech.COMPLETE = False
+
     class Debug:
         PLUNGUS_DECANTIFIED = False
 
@@ -86,13 +103,13 @@ class Env:
         Env.Cellar.reset()
 
         Env.Debug.reset()
+        Env.RatFighter.reset()
+        Env.ThrifTech.reset()
 
     @staticmethod
     def save_game(file_string):
         file_string = join_file_string(file_string)
         with shelve.open("saves/" + file_string + "/env") as db:
-            db["univ illegal currency discovered"] = Env.Universal.ILLEGAL_CURRENCY_DISCOVERED
-            db["univ super illegal item discovered"] = Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED
 
             db["bathroom sitting on toilet"] = Env.Bathroom.SITTING_ON_TOILET
             db["bathroom key on floor"] = Env.Bathroom.KEY_ON_FLOOR
@@ -107,14 +124,17 @@ class Env:
 
             db["debug plungus decantified"] = Env.Debug.PLUNGUS_DECANTIFIED
 
+            db["ratfighter dispensed charm"] = Env.RatFighter.DISPENSED_CHARM
+            db["ratfighter points"] = Env.RatFighter.POINTS
+
+            db["thriftech complete"] = Env.ThrifTech.COMPLETE
+
     @staticmethod
     def load_game(file_string):
         file_string = join_file_string(file_string)
 
         if os.path.exists("saves/" + file_string + "/env.dat"):
             with shelve.open("saves/" + file_string + "/env") as db:
-                Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = bool(db["univ illegal currency discovered"])
-                Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = bool(db["univ super illegal item discovered"])
 
                 Env.Bathroom.SITTING_ON_TOILET = bool(db["bathroom sitting on toilet"])
                 Env.Bathroom.KEY_ON_FLOOR = bool(db["bathroom key on floor"])
@@ -125,9 +145,12 @@ class Env:
                 Env.Kitchen.TRASH_FULL = bool(db["kitchen trash full"])
                 Env.Kitchen.TRASH_TAKEN = db["kitchen trash taken"]
 
-                Env.Cellar.CHARM_ON_TABLE = bool(db["cellar charm on table"])
-
                 Env.Debug.PLUNGUS_DECANTIFIED = bool(db["debug plungus decantified"])
+
+                Env.RatFighter.DISPENSED_CHARM = bool(db["ratfighter dispensed charm"])
+                Env.RatFighter.POINTS = int(db["ratfighter points"])
+
+                Env.ThrifTech.COMPLETE = bool(db["thriftech complete"])
             return True
         else:
             print("Save file %s does not exist" % "_".join(file_string))

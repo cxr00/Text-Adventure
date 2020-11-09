@@ -3,6 +3,8 @@ from player import Player, view_save_files
 from env import Env
 from words import Words, GameText
 
+from microgames.ratfighter.game import run_ratfighter_21xx
+from microgames.thriftech.game import run_thriftech
 
 ROOMS = {}
 DESC = {}
@@ -225,9 +227,7 @@ def misc_check():
             return True
     # Whatever I need to speed up testing
     elif check_cmd("debug") and Player.DEBUG:
-        Player.change_room(Room.OUTSIDE)
-        Player.give_charm(Charm.DEBUG)
-        Player.give_item(Item.PEELED_BANANA)
+        Player.change_room(Room.CELLAR)
         return True
 
     return False
@@ -272,9 +272,17 @@ def bedroom():
             print("It is your bedroom.")
             print("The door to your bathroom is open.")
             print("The door to your kitchen is also open.")
+            print("You could PLAY RATFIGHTER.")
             return True
         elif look("floor"):
             print("There is nothing on the floor.")
+            return True
+        elif check_cmd("play", "ratfighter"):
+            Env.RatFighter.POINTS = run_ratfighter_21xx(Env.RatFighter.POINTS)
+            if Env.RatFighter.POINTS >= 50 and not Env.RatFighter.DISPENSED_CHARM:
+                Player.give_charm(Charm.DECANTIFY)
+                Env.RatFighter.DISPENSED_CHARM = True
+                print("You are rewarded with DECANTIFY.")
             return True
 
     return False
@@ -366,23 +374,22 @@ def kitchen():
 @register_room(Room.VENDOR, GameText.RoomDescriptions.vendor)
 def vendor():
 
-    def check_for_illegal_currency():
-        if Player.HAS_ILLEGAL_CURRENCY:
-            print("The vendor booms in a loud voice:")
-            print("ILLEGAL CURRENCY DETECTED. PREPARE TO BE TAKEN INTO CUSTODY.")
-            print("...")
-            print("Suddenly two robot officers appear and arrest you.")
-            print("You shouldn't have used that contraband CHARM!")
-            Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = True
-            return True
-        return False
+    # def check_for_illegal_currency():
+    #     if Player.HAS_ILLEGAL_CURRENCY:
+    #         print("The vendor booms in a loud voice:")
+    #         print("ILLEGAL CURRENCY DETECTED. PREPARE TO BE TAKEN INTO CUSTODY.")
+    #         print("...")
+    #         print("Suddenly two robot officers appear and arrest you.")
+    #         print("You shouldn't have used that contraband CHARM!")
+    #         Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = True
+    #         return True
+    #     return False
 
     def buy(item):
         if Player.credits >= 10:
             Player.take_credits(10)
             Player.give_item(item)
             print("You buy a %s." % item.value)
-            check_for_illegal_currency()
         else:
             print("You cannot afford the %s." % item.value)
         return True
@@ -432,15 +439,8 @@ def monetizor():
         if check_cmd(Words.INSERT, "widget"):
             Player.give_credits(5)
             Player.take_item(Item.WIDGET)
-            Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = True
             print("You put the widget into the monetizor.")
             print("It whirs and spits out 5 credits. Not bad.")
-
-            print("The monetizor booms in a loud voice:")
-            print("SUPER ILLEGAL ITEM DETECTED. PREPARE TO BE TAKEN INTO CUSTODY.")
-            print("...")
-            print("Suddenly two robot officers appear and arrest you.")
-            print("You shouldn't have messed with that WIDGET!")
             return True
 
     return False
@@ -552,14 +552,20 @@ def cellar():
     else:
         if look_around("cellar"):
             print("It's mostly empty, but there's a few pieces of old furniture.")
-            if Env.Cellar.CHARM_ON_TABLE:
-                print("There is some sort of CHARM on an end table.")
+            print("There is a THRIFTECH entertainment module.")
             return True
-        elif check_cmd(Words.TAKE, "charm") and Env.Cellar.CHARM_ON_TABLE:
-            Player.give_charm(Charm.GENERATE)
-            Env.Cellar.CHARM_ON_TABLE = False
-            print("You take the GENERATE charm from the table.")
+        elif check_cmd("play", "thriftech"):
+            Env.ThrifTech.COMPLETE = run_thriftech()
+            if Env.ThrifTech.COMPLETE and not Env.ThrifTech.REWARD_GIVEN:
+                Player.give_charm(Charm.GENERATE)
+                Env.ThrifTech.REWARD_GIVEN = True
+                print("You are rewarded with a GENERATE charm.")
             return True
+        # elif check_cmd(Words.TAKE, "charm") and Env.Cellar.CHARM_ON_TABLE:
+        #     Player.give_charm(Charm.GENERATE)
+        #     Env.Cellar.CHARM_ON_TABLE = False
+        #     print("You take the GENERATE charm from the table.")
+        #     return True
 
     return False
 
@@ -578,12 +584,12 @@ def test_room():
         print("There are windy, curly mushrooms growing all over.")
         print("You don't want to touch any of them.")
         return True
-    elif check_cmd("use", "debug") and Player.DEBUG:
-        if Player.has_charm(Charm.DEBUG) and not Env.Debug.PLUNGUS_DECANTIFIED:
+    elif check_cmd("use", "decantify"):
+        if Player.has_charm(Charm.DECANTIFY) and not Env.Debug.PLUNGUS_DECANTIFIED:
             Env.Debug.PLUNGUS_DECANTIFIED = True
-            print("You employ the debug charm's powers to decantify the plungus.")
+            print("You employ the charm's powers to decantify the plungus.")
         else:
-            print("You have no debug charm to use.")
+            print("You have no such charm to use.")
         return True
     elif check_cmd("check", ["state", "plungus"]):
         if Env.Debug.PLUNGUS_DECANTIFIED:
@@ -611,12 +617,8 @@ def run_game():
                 ROOMS[room]()
 
                 # Check win condition
-                if Env.Outside.TRASH_IN_BIN and Player.HAS_POOPED:
+                if Env.Outside.TRASH_IN_BIN and Player.HAS_POOPED and Env.Debug.PLUNGUS_DECANTIFIED:
                     end = True
-                # Check lose condition
-                elif Env.Universal.ILLEGAL_CURRENCY_DISCOVERED or Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED:
-                    print("YOU HAVE LOST THE GAME.")
-                    exit(0)
 
                 break
     print("Game Complete! Congratulations!")

@@ -57,6 +57,7 @@ class Item(Enum):
 # The set of charms which may appear in the player's charm box
 class Charm(Enum):
     GENERATE = "generate"
+    DECANTIFY = "decantify"
 
     DEBUG = "debug"
 

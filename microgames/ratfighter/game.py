@@ -187,14 +187,9 @@ def battle(*rat_stats):
     return True
 
 
-def run_game():
+def run_ratfighter_21xx(points=0):
+    Player.POINTS = points
     end = False
-    try:
-        Player.load_game()
-    except FileNotFoundError:
-        pass
-    except KeyError:
-        pass
 
     while not end:
         if Player.MENU == Menu.START:
@@ -203,6 +198,7 @@ def run_game():
             get_cmd()
             if check_cmd("quit"):
                 end = True
+                print("GOODBYE!")
             else:
                 start_menu()
         elif Player.MENU == Menu.ACTION:
@@ -231,8 +227,4 @@ def run_game():
             get_cmd()
             shop_menu()
 
-    Player.save_game()
     return Player.POINTS
-
-
-points = run_game()

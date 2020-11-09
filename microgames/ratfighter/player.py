@@ -1,6 +1,5 @@
 from microgames.ratfighter.enums import Menu
 from random import randint
-import shelve
 
 
 class Player:
@@ -28,34 +27,6 @@ class Player:
     MENU = Menu.START
 
     @staticmethod
-    def save_game():
-        with shelve.open("saves/ratfighter") as db:
-            db["max health"] = Player.MAX_HEALTH
-            db["current health"] = Player.CURRENT_HEALTH
-
-            db["weapon"] = Player.WEAPON
-            db["armor"] = Player.ARMOR
-            db["accessory"] = Player.ACCESSORY
-
-            db["credits"] = Player.CREDITS
-            db["points"] = Player.POINTS
-
-            db["menu"] = Player.MENU.value
-
-    @staticmethod
-    def load_game():
-        with shelve.open("saves/ratfighter") as db:
-            Player.MAX_HEALTH = db["max health"]
-            Player.CURRENT_HEALTH = db["current health"]
-
-            Player.WEAPON = db["weapon"]
-            Player.ARMOR = db["armor"]
-            Player.ACCESSORY = db["accessory"]
-
-            Player.CREDITS = db["credits"]
-            Player.POINTS = db["points"]
-
-    @staticmethod
     def reset():
         Player.MAX_HEALTH = 5
         Player.CURRENT_HEALTH = 5
@@ -71,7 +42,7 @@ class Player:
 
     @staticmethod
     def get_stats():
-        out = "HEALTH: %s / %s\n" % (str(Player.CURRENT_HEALTH),str(Player.MAX_HEALTH))
+        out = "HEALTH: %s / %s\n" % (str(Player.CURRENT_HEALTH), str(Player.MAX_HEALTH))
         out += "WEAPON: %s\n" % str(Player.WEAPON)
         out += "ARMOR: %s\n" % str(Player.ARMOR)
         out += "ACCESSORY: %s\n" % str(Player.ACCESSORY)

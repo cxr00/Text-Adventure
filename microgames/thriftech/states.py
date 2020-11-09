@@ -7,6 +7,8 @@ class Room(Enum):
     AT_WORKBENCH = 1
     AT_COMPUTER = 2
 
+    QUIT_GAME = 3
+
     NULL = 99
 
     @staticmethod

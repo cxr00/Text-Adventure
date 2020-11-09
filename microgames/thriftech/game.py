@@ -114,6 +114,9 @@ def universal_check():
     elif check_cmd("computer"):
         room = Room.AT_COMPUTER
         return True
+    elif check_cmd("quit"):
+        room = Room.QUIT_GAME
+        return True
     return False
 
 
@@ -247,40 +250,47 @@ def at_computer():
     return False
 
 
-end = False
+def run_thriftech():
+    global room
+    end = False
 
-while not end:
-    valid_command = False
-    if room == Room.AT_MACHINE:
-        print("You are at the recycling machine.")
-        print("PROCESS TRASH\tWORKBENCH\tCOMPUTER\tINVENTORY")
-        get_cmd()
-        if not universal_check():
-            valid_command = at_machine()
-        else:
-            valid_command = True
-    elif room == Room.AT_WORKBENCH:
-        print("You are at the workbench.")
-        print("CRAFT\tMACHINE\tCOMPUTER\tINVENTORY")
-        get_cmd()
-        if not universal_check():
-            valid_command = at_workbench()
-        else:
-            valid_command = True
-    elif room == Room.AT_COMPUTER:
-        print("You are at the defunct computer.")
-        print("CRAFT\tLOOK COMPUTER\tFIX COMPUTER\tMACHINE\tWORKBENCH\tINVENTORY")
-        get_cmd()
-        if not universal_check():
-            valid_command = at_computer()
-        else:
-            valid_command = True
-        if Computer.computer_is_fixed():
-            end = True
-            print("You have completely fixed the computer.")
+    while not end:
+        valid_command = False
+        if room == Room.AT_MACHINE:
+            print("You are at the recycling machine.")
+            print("PROCESS TRASH\tWORKBENCH\tCOMPUTER\tINVENTORY")
+            get_cmd()
+            if not universal_check():
+                valid_command = at_machine()
+            else:
+                valid_command = True
+        elif room == Room.AT_WORKBENCH:
+            print("You are at the workbench.")
+            print("CRAFT\tMACHINE\tCOMPUTER\tINVENTORY")
+            get_cmd()
+            if not universal_check():
+                valid_command = at_workbench()
+            else:
+                valid_command = True
+        elif room == Room.AT_COMPUTER:
+            print("You are at the defunct computer.")
+            print("CRAFT\tLOOK COMPUTER\tFIX COMPUTER\tMACHINE\tWORKBENCH\tINVENTORY")
+            get_cmd()
+            if not universal_check():
+                valid_command = at_computer()
+            else:
+                valid_command = True
+            if Computer.computer_is_fixed():
+                end = True
+                print("You have completely fixed the computer.")
+        elif room == Room.QUIT_GAME:
+            room = Room.AT_MACHINE
+            print("GOODBYE!")
+            return end
 
-    if not valid_command:
-        print("I don't understand \"%s\"" % " ".join(cmd))
+        if not valid_command:
+            print("I don't understand \"%s\"" % " ".join(cmd))
 
+    print("GAME COMPLETE. CONGRATULATIONS!")
 
-print("GAME COMPLETE. CONGRATULATIONS!")
+    return end
