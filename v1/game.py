@@ -1,7 +1,7 @@
-from enums import *
-from player import Player, view_save_files
-from env import Env
-from words import Words, GameText
+from v1.enums import *
+from v1.player import Player, view_save_files
+from v1.env import Env
+from v1.words import Words, GameText
 
 from microgames.ratfighter.game import run_ratfighter_21xx
 from microgames.thriftech.game import run_thriftech
@@ -227,8 +227,12 @@ def misc_check():
             return True
     # Whatever I need to speed up testing
     elif check_cmd("debug") and Player.DEBUG:
-        Player.change_room(Room.CELLAR)
-        Env.ThrifTech.COMPLETE = True
+        Env.Outside.TRASH_IN_BIN = True
+        return True
+    elif check_cmd("win", "condition") and Player.DEBUG:
+        print("HAS POOPED: " + str(Player.HAS_POOPED))
+        print("PLUNGUS DECANTIFIED: " + str(Env.Debug.PLUNGUS_DECANTIFIED))
+        print("TRASH IN BIN: " + str(Env.Outside.TRASH_IN_BIN))
         return True
 
     return False
@@ -584,6 +588,8 @@ def test_room():
         if Player.has_charm(Charm.DECANTIFY) and not Env.Debug.PLUNGUS_DECANTIFIED:
             Env.Debug.PLUNGUS_DECANTIFIED = True
             print("You employ the charm's powers to decantify the plungus.")
+        elif Player.has_charm(Charm.DECANTIFY):
+            print("You have already decantified the plungus")
         else:
             print("You have no such charm to use.")
         return True

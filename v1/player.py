@@ -1,11 +1,11 @@
-from enums import Room, Charm, Item
+from v1.enums import Room, Charm, Item
 import shelve
 import os
 
 
 def check_for_save_folder(fs=""):
-    if not os.path.exists("saves"):
-        os.mkdir("saves")
+    if not os.path.exists("../saves"):
+        os.mkdir("../saves")
     if not os.path.exists("saves/" + fs):
         os.mkdir("saves/" + fs)
 
@@ -16,7 +16,7 @@ def join_file_string(fs):
 
 def view_save_files():
     check_for_save_folder()
-    l = os.listdir("saves/")
+    l = os.listdir("../saves/")
     out = []
     for each in l:
         name = " ".join(each.split("_"))

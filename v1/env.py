@@ -9,14 +9,10 @@ def join_file_string(fs):
 class Env:
 
     class Universal:
-        # ILLEGAL_CURRENCY_DISCOVERED = False
-        # SUPER_ILLEGAL_ITEM_DISCOVERED = False
 
         @staticmethod
         def reset():
             pass
-            # Env.Universal.ILLEGAL_CURRENCY_DISCOVERED = False
-            # Env.Universal.SUPER_ILLEGAL_ITEM_DISCOVERED = False
 
     class Bedroom:
 
@@ -122,6 +118,9 @@ class Env:
             db["kitchen trash full"] = Env.Kitchen.TRASH_FULL
             db["kitchen trash taken"] = Env.Kitchen.TRASH_TAKEN
 
+            db["outside trash in bin"] = Env.Outside.TRASH_IN_BIN
+            db["outside cellar door locked"] = Env.Outside.CELLAR_DOOR_LOCKED
+
             db["cellar charm on table"] = Env.Cellar.CHARM_ON_TABLE
 
             db["debug plungus decantified"] = Env.Debug.PLUNGUS_DECANTIFIED
@@ -147,6 +146,9 @@ class Env:
                 Env.Kitchen.CAN_IN_TRASH = bool(db["kitchen can in trash"])
                 Env.Kitchen.TRASH_FULL = bool(db["kitchen trash full"])
                 Env.Kitchen.TRASH_TAKEN = db["kitchen trash taken"]
+
+                Env.Outside.TRASH_IN_BIN = bool(db["outside trash in bin"])
+                Env.Outside.CELLAR_DOOR_LOCKED = bool(db["outside cellar door locked"])
 
                 Env.Debug.PLUNGUS_DECANTIFIED = bool(db["debug plungus decantified"])
 
