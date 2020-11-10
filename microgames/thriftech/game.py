@@ -117,6 +117,15 @@ def universal_check():
     elif check_cmd("quit"):
         room = Room.QUIT_GAME
         return True
+    elif check_cmd("debug"):
+        inventory["psu"] += 1
+        inventory["motherboard"] += 1
+        inventory["processor"] += 1
+        inventory["graphics card"] += 1
+        inventory["hard drive"] += 1
+        inventory["solid state drive"] += 1
+        inventory["ram"] += 1
+        return True
     return False
 
 
