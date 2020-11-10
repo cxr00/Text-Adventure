@@ -25,7 +25,7 @@ class Player:
             "armor": 0,
             "accessory": 2,
             "credits": 1,
-            "points": 0
+            "points": Player.data["points"]
         }
 
         Player.MENU = Menu.START

@@ -50,7 +50,7 @@ def start_menu():
     elif check_cmd("points"):
         print("You have earned %s points." % str(Player.data["points"]))
     elif check_cmd("reset"):
-        are_you_sure = input("Are you sure?\nThis will delete your progress. (y/n) >>> " % str(Player.data["points"]))
+        are_you_sure = input("Are you sure? This will delete your progress. (y/n) >>> ")
         if are_you_sure[0] == "y":
             Player.reset()
 
