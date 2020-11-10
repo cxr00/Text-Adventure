@@ -1,6 +1,6 @@
 from microgames.ratfighter.enums import Menu
 from microgames.ratfighter.player import Player
-
+from random import randint
 
 cmd = []
 
@@ -48,9 +48,9 @@ def start_menu():
     if check_cmd("start"):
         Player.change_menu(Menu.ACTION)
     elif check_cmd("points"):
-        print("You have earned %s points." % str(Player.POINTS))
+        print("You have earned %s points." % str(Player.data["points"]))
     elif check_cmd("reset"):
-        are_you_sure = input("Are you sure? This will delete your progress but not your %s points. (y/n) >>> " % str(Player.POINTS))
+        are_you_sure = input("Are you sure?\nThis will delete your progress. (y/n) >>> " % str(Player.data["points"]))
         if are_you_sure[0] == "y":
             Player.reset()
 
@@ -72,43 +72,48 @@ def action_menu():
 
 def shop_menu():
     if check_cmd("upgrade", ["health", "hp"]) or check_cmd(["health", "hp"]):
-        if Player.CREDITS >= 3:
-            Player.CREDITS -= 3
-            Player.MAX_HEALTH += 1
+        if Player.data["credits"] >= 3:
+            Player.data["credits"] -= 3
+            Player.data["max health"] += 1
             Player.heal()
             print("You upgrade your health. You are also fully healed.")
         else:
             print("You cannot afford to upgrade your health.")
         return True
     elif check_cmd("upgrade", "weapon") or check_cmd("weapon"):
-        if Player.CREDITS >= 5:
-            Player.CREDITS -= 5
-            Player.WEAPON += 1
+        if Player.data["credits"] >= 5:
+            Player.data["credits"] -= 5
+            Player.data["weapon"] += 1
             print("You upgrade your weapon.")
         else:
             print("You cannot afford to upgrade your weapon.")
         return True
     elif check_cmd("upgrade", "armor") or check_cmd("armor"):
-        if Player.CREDITS >= 3:
-            Player.CREDITS -= 3
-            Player.ARMOR += 1
+        if Player.data["credits"] >= 3:
+            Player.data["credits"] -= 3
+            Player.data["armor"] += 1
             print("You upgrade your armor.")
         else:
             print("You cannot afford to upgrade your armor")
         return True
     elif check_cmd("upgrade", ["accessory", "acc"]) or check_cmd(["accessory", "acc"]):
-        if Player.CREDITS >= 2:
-            Player.CREDITS -= 2
-            Player.ACCESSORY += 1
+        if Player.data["credits"] >= 2:
+            Player.data["credits"] -= 2
+            Player.data["accessory"] += 1
             print("You upgrade your accessory.")
         else:
             print("You cannot afford to upgrade your accessory.")
         return True
     elif check_cmd("heal"):
-        if Player.CREDITS >= 1:
-            Player.CREDITS -= 1
-            Player.heal()
-            print("Your health has been restored")
+        if Player.data["credits"] >= 1:
+            if Player.data["current health"] == Player.data["max health"]:
+                print("You do not need to be healed right now.")
+            else:
+                Player.data["credits"] -= 1
+                Player.heal()
+                print("Your health has been restored.")
+        else:
+            print("You cannot afford to upgrade your health")
         return True
 
     elif check_cmd(["leave", "exit"]):
@@ -150,24 +155,26 @@ def battle(*rat_stats):
 
     print("You are now in a FIGHT with a %s!" % rat_name)
 
-    while Player.CURRENT_HEALTH > 0 and rat_current_health > 0:
+    while Player.data["current health"] > 0 and rat_current_health > 0:
         print("FIGHT\tSTATS\tENEMY\tFLEE")
         get_cmd()
         if check_cmd(["fight", "attack"]):
-            rat_current_health -= Player.WEAPON - rat_armor
-            print("You hit the rat for %s damage." % str(Player.WEAPON - rat_armor))
+            rat_current_health -= Player.data["weapon"] - rat_armor
+            print("You hit the rat for %s damage." % str(Player.data["weapon"] - rat_armor))
             if rat_current_health <= 0:
-                total_payout = Player.get_credit_reward(rat_payout)
-                Player.POINTS += total_payout
+                credit_payout = randint(1, Player.data["accessory"]) + rat_payout
+                Player.data["credits"] += credit_payout
+                Player.data["points"] += rat_payout
                 print("You have defeated the %s!" % rat_name)
-                print("You gained %s credits and %s points!" % (total_payout, total_payout))
+                print("You gained %s credits and %s points!" % (credit_payout, rat_payout))
                 Player.change_menu(Menu.ACTION)
                 return True
             else:
-                Player.CURRENT_HEALTH -= rat_damage - Player.ARMOR
-                print("The %s hits you for %s damage." % (rat_name, str(rat_damage - Player.ARMOR)))
-                if Player.CURRENT_HEALTH <= 0:
-                    print("You have been defeated.")
+                Player.data["current health"] -= rat_damage - Player.data["armor"]
+                print("The %s hits you for %s damage." % (rat_name, str(rat_damage - Player.data["armor"])))
+                if Player.data["current health"] <= 0:
+                    print("You have been defeated!")
+                    print("Your progress will be reset.")
                     Player.reset()
                     Player.change_menu(Menu.START)
                     return True
@@ -187,8 +194,8 @@ def battle(*rat_stats):
     return True
 
 
-def run_ratfighter_21xx(points=0):
-    Player.POINTS = points
+def run_ratfighter_21xx(data):
+    Player.data = data
     end = False
 
     while not end:
@@ -216,7 +223,7 @@ def run_ratfighter_21xx(points=0):
             get_cmd()
             fight_menu()
         elif Player.MENU == Menu.SHOP:
-            print("You have %s credits to spend." % str(Player.CREDITS))
+            print("You have %s credits to spend." % str(Player.data["credits"]))
             print("SHOP UPGRADES:")
             print("HEALTH: 3 credits")
             print("WEAPON: 5 credits")
@@ -227,4 +234,4 @@ def run_ratfighter_21xx(points=0):
             get_cmd()
             shop_menu()
 
-    return Player.POINTS
+    return Player.data
