@@ -37,5 +37,4 @@ class Computer:
     @staticmethod
     def reset():
         for each in Computer.data:
-            print("clearing %s" % each)
             Computer.data[each] = False

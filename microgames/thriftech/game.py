@@ -124,6 +124,12 @@ def universal_check():
     elif check_cmd(["quit", "exit"]):
         room = Room.QUIT_GAME
         return True
+    elif check_cmd("reset"):
+        Computer.reset()
+        reset_inventory()
+        room = Room.AT_MACHINE
+        print("You have reset your progress.")
+        return True
     elif check_cmd("debug"):
         inventory["psu"] += 1
         inventory["motherboard"] += 1
@@ -299,8 +305,6 @@ def run_thriftech(data):
 
     if Computer.is_fixed():
         print("GAME COMPLETE. CONGRATULATIONS!")
-        Computer.reset()
-        reset_inventory()
         room = Room.AT_MACHINE
 
     return {"computer": Computer.data, "inventory": inventory}
