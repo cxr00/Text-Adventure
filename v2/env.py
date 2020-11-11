@@ -35,10 +35,52 @@ class Env:
                 "credits": 1,
                 "points": 0
             },
+        "thriftech":
+            {
+                "computer":
+                    {
+                        "psu": False,
+                        "motherboard": False,
+                        "processor": False,
+                        "graphics card": False,
+                        "hard drive": False,
+                        "solid state drive": False,
+                        "ram": False
+                    },
+                "inventory":
+                    {
+                        "glass": 0,
+                        "scrap metal": 0,
+                        "plastic": 0,
+                        "copper wire": 0,
+
+                        "circuit board": 0,
+                        "cable": 0,
+                        "microchip": 0,
+                        "capacitor": 0,
+                        "casing": 0,
+
+                        "psu": 0,
+                        "motherboard": 0,
+                        "processor": 0,
+                        "graphics card": 0,
+                        "hard drive": 0,
+                        "solid state drive": 0,
+                        "ram": 0
+                    }
+            },
         "games":
             {
-                "ratfighter": True,
-                "thriftech": False
+                "owned":
+                    {
+                        "ratfighter": True,
+                        "thriftech": False
+                    },
+                "completed":
+                    {
+                        "ratfighter": False,
+                        "thriftech": False
+                    }
             },
         "bedroom":
             {
@@ -48,10 +90,6 @@ class Env:
         "bathroom":
             {
                 "thriftech": True
-            },
-        "kitchen":
-            {
-
             }
     }
 
