@@ -169,16 +169,17 @@ def bedroom():
         else:
             print("Your room is tidy.")
         return True
+
     elif check_cmd("play", "ratfighter"):
-        if Env.data["games"]["ratfighter"]:
+        if Env.data["games"]["owned"]["ratfighter"]:
             Env.data["ratfighter"] = run_ratfighter_21xx(Env.data["ratfighter"])
         else:
             print("You do not have RATFIGHTER.")
         return True
     elif check_cmd("play", "thriftech"):
-        if Env.data["games"]["thriftech"]:
-            victory = run_thriftech()
-            print("victory: %s" % str(victory))
+        if Env.data["games"]["owned"]["thriftech"]:
+            Env.data["thriftech"] = run_thriftech(Env.data["thriftech"])
+            Env.data["games"]["completed"]["thriftech"] = Env.data["games"]["completed"]["thriftech"] or all(Env.data["thriftech"]["computer"].values())
         else:
             print("You do not have THRIFTECH.")
         return True
@@ -212,12 +213,12 @@ def bathroom():
         return True
     elif check_cmd(["take", "get", "grab"], ["thriftech", "cartridge"]):
         Env.data["bathroom"]["thriftech"] = False
-        Env.data["games"]["thriftech"] = True
+        Env.data["games"]["owned"]["thriftech"] = True
         print("You grab the THRIFTECH cartridge.")
         print("You can now PLAY it in your bedroom.")
         return True
 
-    elif go(("bedroom", Room.BEDROOM)):
+    elif go((["bedroom", "room"], Room.BEDROOM)):
         return True
 
 
