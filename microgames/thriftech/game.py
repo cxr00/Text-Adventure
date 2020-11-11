@@ -24,6 +24,13 @@ inventory = {
     "solid state drive": 0,
     "ram": 0
 }
+
+
+def reset_inventory():
+    for each in inventory:
+        inventory[each] = 0
+
+
 room = Room.AT_MACHINE
 
 
@@ -114,7 +121,7 @@ def universal_check():
     elif check_cmd("computer"):
         room = Room.AT_COMPUTER
         return True
-    elif check_cmd("quit"):
+    elif check_cmd(["quit", "exit"]):
         room = Room.QUIT_GAME
         return True
     elif check_cmd("debug"):
@@ -134,19 +141,23 @@ def at_machine():
     if check_cmd("process", "trash"):
         a = randint(0, 2)
         inventory["glass"] += a
-        print("You get %s glass." % str(a))
+        if a > 0:
+            print("You get %s glass." % str(a))
 
         a = randint(0, 2)
         inventory["scrap metal"] += a
-        print("You get %s scrap metal." % str(a))
+        if a > 0:
+            print("You get %s scrap metal." % str(a))
 
         a = randint(0, 2)
         inventory["plastic"] += a
-        print("You get %s plastic." % str(a))
+        if a > 0:
+            print("You get %s plastic." % str(a))
 
         a = randint(0, 2)
         inventory["copper wire"] += a
-        print("You get %s copper wire." % str(a))
+        if a > 0:
+            print("You get %s copper wire." % str(a))
 
         return True
 
@@ -185,20 +196,9 @@ def at_workbench():
 # Place the components into the computer
 def at_computer():
     if check_cmd(["look", "view", "check"], "computer"):
-        if not Computer.PSU:
-            print("The PSU is missing.")
-        if not Computer.MOTHERBOARD:
-            print("The MOTHERBOARD is missing.")
-        if not Computer.PROCESSOR:
-            print("The PROCESSOR is missing.")
-        if not Computer.GRAPHICS_CARD:
-            print("The GRAPHICS CARD is missing.")
-        if not Computer.HARD_DRIVE:
-            print("The HARD DRIVE is missing.")
-        if not Computer.SOLID_STATE_DRIVE:
-            print("The SOLID STATE DRIVE is missing.")
-        if not Computer.RAM:
-            print("The RAM is missing.")
+        for each in Computer.data:
+            if not Computer.data[each]:
+                print("The %s is missing." % each)
         return True
 
     elif check_cmd("craft") and len(cmd) == 1:
@@ -233,40 +233,30 @@ def at_computer():
         return True
 
     elif check_cmd("fix", "computer"):
-        if not Computer.PSU and inventory["psu"] >= 1:
-            Computer.PSU = True
-            print("You install the new PSU in the computer.")
-        if not Computer.MOTHERBOARD and inventory["motherboard"] >= 1:
-            inventory["motherboard"] -= 1
-            Computer.MOTHERBOARD = True
-            print("You install the new MOTHERBOARD in the computer.")
-        if not Computer.PROCESSOR and inventory["processor"] >= 1:
-            inventory["processor"] -= 1
-            Computer.PROCESSOR = True
-            print("You install the new PROCESSOR in the computer.")
-        if not Computer.GRAPHICS_CARD and inventory["graphics card"] >= 1:
-            inventory["graphics card"] -= 1
-            Computer.GRAPHICS_CARD = True
-            print("You install the new GRAPHICS CARD in the computer.")
-        if not Computer.HARD_DRIVE and inventory["hard drive"] >= 1:
-            inventory["hard drive"] -= 1
-            Computer.HARD_DRIVE = True
-            print("You install the new HARD DRIVE in the computer.")
-        if not Computer.SOLID_STATE_DRIVE and inventory["solid state drive"] >= 1:
-            inventory["solid state drive"] -= 1
-            Computer.SOLID_STATE_DRIVE = True
-            print("You install the new SOLID STATE DRIVE in the computer.")
-        if not Computer.RAM and inventory["ram"] >= 1:
-            inventory["ram"] -= 1
-            Computer.RAM = True
-            print("You install the new RAM in the computer.")
+        at_least_one = False
+        for each in Computer.data:
+            if not Computer.data[each] and inventory[each] >= 1:
+                inventory[each] -= 1
+                Computer.data[each] = True
+                at_least_one = True
+                print("You install the new %s in the computer." % each)
+        if not at_least_one:
+            print("You have no components to put in the computer.")
         return True
+
+    elif check_cmd(["exit", "quit"]):
+        global room
+        room = Room.QUIT_GAME
 
     return False
 
 
-def run_thriftech():
+def run_thriftech(data):
+    global inventory
     global room
+
+    inventory = data["inventory"]
+    Computer.data = data["computer"]
     end = False
 
     while not end:
@@ -295,17 +285,22 @@ def run_thriftech():
                 valid_command = at_computer()
             else:
                 valid_command = True
-            if Computer.computer_is_fixed():
+            if Computer.is_fixed():
                 end = True
                 print("You have completely fixed the computer.")
         elif room == Room.QUIT_GAME:
             room = Room.AT_MACHINE
             print("GOODBYE!")
-            return end
+            end = True
+            valid_command = True
 
         if not valid_command:
             print("I don't understand \"%s\"" % " ".join(cmd))
 
-    print("GAME COMPLETE. CONGRATULATIONS!")
+    if Computer.is_fixed():
+        print("GAME COMPLETE. CONGRATULATIONS!")
+        Computer.reset()
+        reset_inventory()
+        room = Room.AT_MACHINE
 
-    return end
+    return {"computer": Computer.data, "inventory": inventory}

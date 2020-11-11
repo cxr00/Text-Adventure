@@ -20,21 +20,22 @@ class Room(Enum):
 
 
 class Computer:
-
-    PSU = False
-    MOTHERBOARD = False
-    PROCESSOR = False
-    GRAPHICS_CARD = False
-    HARD_DRIVE = False
-    SOLID_STATE_DRIVE = False
-    RAM = False
+    data = {
+        "psu": False,
+        "motherboard": False,
+        "processor": False,
+        "graphics card": False,
+        "hard drive": False,
+        "solid state drive": False,
+        "ram": False
+    }
 
     @staticmethod
-    def computer_is_fixed():
-        return Computer.PSU\
-               and Computer.MOTHERBOARD \
-               and Computer.PROCESSOR \
-               and Computer.GRAPHICS_CARD \
-               and Computer.HARD_DRIVE \
-               and Computer.SOLID_STATE_DRIVE \
-               and Computer.RAM
+    def is_fixed():
+        return all(Computer.data.values())
+
+    @staticmethod
+    def reset():
+        for each in Computer.data:
+            print("clearing %s" % each)
+            Computer.data[each] = False
