@@ -1,6 +1,7 @@
 from v2.env import Env, Room
 from microgames.ratfighter.game import run_ratfighter_21xx
 from microgames.thriftech.game import run_thriftech
+from microgames.stox.game import run_stox
 
 ROOMS = {}
 DESC = {}
@@ -174,14 +175,23 @@ def bedroom():
         if Env.data["games"]["owned"]["ratfighter"]:
             Env.data["ratfighter"] = run_ratfighter_21xx(Env.data["ratfighter"])
         else:
-            print("You do not have RATFIGHTER.")
+            print("You do not have RatFighter.")
         return True
     elif check_cmd("play", "thriftech"):
         if Env.data["games"]["owned"]["thriftech"]:
             Env.data["thriftech"] = run_thriftech(Env.data["thriftech"])
-            Env.data["games"]["completed"]["thriftech"] = Env.data["games"]["completed"]["thriftech"] or all(Env.data["thriftech"]["computer"].values())
+            if all(Env.data["thriftech"]["computer"].values()):
+                Env.data["games"]["completed"]["thriftech"] = True
         else:
-            print("You do not have THRIFTECH.")
+            print("You do not have ThrifTech.")
+        return True
+    elif check_cmd("play", "stox"):
+        if Env.data["games"]["owned"]["stox"]:
+            Env.data["stox"] = run_stox(Env.data["stox"])
+            if Env.data["stox"]["credits"] >= 200:
+                Env.data["games"]["completed"]["stox"] = True
+        else:
+            print("You do not have Stox")
         return True
 
     elif check_cmd("make", "bed"):
@@ -211,7 +221,7 @@ def bathroom():
         if Env.data["bathroom"]["thriftech"]:
             print("There is a THRIFTECH cartridge on the floor.")
         return True
-    elif check_cmd(["take", "get", "grab"], ["thriftech", "cartridge"]):
+    elif check_cmd(["take", "get", "grab"], ["thriftech", "cartridge"]) and Env.data["bathroom"]["thriftech"]:
         Env.data["bathroom"]["thriftech"] = False
         Env.data["games"]["owned"]["thriftech"] = True
         print("You grab the THRIFTECH cartridge.")

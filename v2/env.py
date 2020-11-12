@@ -25,6 +25,21 @@ class Env:
                 "current room": "bedroom",
                 "previous room": None
             },
+        "games":
+            {
+                "owned":
+                    {
+                        "ratfighter": True,
+                        "thriftech": True,
+                        "stox": True
+                    },
+                "completed":
+                    {
+                        "ratfighter": False,
+                        "thriftech": False,
+                        "stox": False
+                    }
+            },
         "ratfighter":
             {
                 "max health": 5,
@@ -69,18 +84,30 @@ class Env:
                         "ram": 0
                     }
             },
-        "games":
+        "stox":
             {
-                "owned":
-                    {
-                        "ratfighter": True,
-                        "thriftech": False
-                    },
-                "completed":
-                    {
-                        "ratfighter": False,
-                        "thriftech": False
-                    }
+            "credits": 100.00,
+            "stox":
+                {
+                    "cxr": 0,
+                    "vlt": 0,
+                    "zot": 0,
+                    "nem": 0
+                },
+            "day price":
+                {
+                    "cxr": 10,
+                    "vlt": 10,
+                    "zot": 10,
+                    "nem": 10
+                },
+            "previous day price":
+                {
+                    "cxr": 0,
+                    "vlt": 0,
+                    "zot": 0,
+                    "nem": 0
+                }
             },
         "bedroom":
             {
@@ -89,7 +116,7 @@ class Env:
             },
         "bathroom":
             {
-                "thriftech": True
+                "thriftech": False
             }
     }
 
