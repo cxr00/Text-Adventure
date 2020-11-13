@@ -31,13 +31,15 @@ class Env:
                     {
                         "ratfighter": True,
                         "thriftech": True,
-                        "stox": True
+                        "stox": True,
+                        "vocabuloid": True
                     },
                 "completed":
                     {
                         "ratfighter": False,
                         "thriftech": False,
-                        "stox": False
+                        "stox": False,
+                        "vocabuloid": False
                     }
             },
         "ratfighter":
@@ -108,6 +110,10 @@ class Env:
                     "zot": 0,
                     "nem": 0
                 }
+            },
+        "vocabuloid":
+            {
+
             },
         "bedroom":
             {
