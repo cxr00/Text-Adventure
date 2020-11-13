@@ -1,6 +1,7 @@
 from random import shuffle
 from enum import Enum
 from copy import deepcopy
+from time import time
 
 words = [
     "sensplicious",
@@ -22,10 +23,11 @@ words = [
 ]
 
 
-def run_vocabuloid():
+def run_vocabuloid(best_time):
     strikes = 0
     test = deepcopy(words)
     shuffle(test)
+    start_time = time()
 
     print("Welcome to Vocabuloid!")
     print("Type the words as they appear on screen.")
@@ -40,9 +42,17 @@ def run_vocabuloid():
             print("WRONG!")
 
     if len(test) == 0:
+        game_time = round(time() - start_time, 2)
         print("You have won the game!")
+        print("Your time was %s seconds" % str(game_time))
+        if strikes > 0:
+            game_time += strikes * 5
+            print("Plus 5 seconds for your strike.")
+        print("Your final time is %s seconds." % str(game_time))
+        if game_time < best_time or best_time == 0:
+            print("NEW RECORD!")
         print("Goodbye.")
-        return True
+        return game_time
     if strikes >= 2:
         print("You have lost the game!")
         print("Goodbye.")
