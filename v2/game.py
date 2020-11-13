@@ -1,9 +1,11 @@
+import json
 from v2.env import Env, Room
 from microgames.ratfighter.game import run_ratfighter_21xx
 from microgames.thriftech.game import run_thriftech
 from microgames.stox.game import run_stox
 from microgames.vocabuloid.game import run_vocabuloid
 from microgames.growlike.game import run_growlike
+from microgames.storio.game import run_storio
 
 ROOMS = {}
 DESC = {}
@@ -124,7 +126,8 @@ def debug_check():
             print("Failed to load game.")
         return True
     elif check_cmd("debug"):
-        print(Env.data)
+        pretty_data = json.dumps(Env.data, indent=2)
+        print(pretty_data)
         return True
     return False
 
@@ -196,9 +199,11 @@ def bedroom():
             print("You do not have Stox")
     elif check_cmd("play", "vocabuloid"):
         if Env.data["games"]["owned"]["vocabuloid"]:
-            game_complete = run_vocabuloid()
+            game_complete = run_vocabuloid(Env.data["vocabuloid"]["best time"])
             if game_complete:
                 Env.data["games"]["completed"]["vocabuloid"] = True
+                if game_complete < Env.data["vocabuloid"]["best time"] or Env.data["vocabuloid"]["best time"] == 0:
+                    Env.data["vocabuloid"]["best time"] = game_complete
         else:
             print("You do not have Vocabuloid.")
         return True
@@ -209,6 +214,14 @@ def bedroom():
                 Env.data["games"]["completed"]["growlike"] = True
         else:
             print("You do not have GrowLike.")
+        return True
+    elif check_cmd("play", "storio"):
+        if Env.data["games"]["owned"]["storio"]:
+            Env.data["storio"] = run_storio(Env.data["storio"])
+            if Env.data["storio"]["credits"] > 260:
+                Env.data["games"]["completed"]["storio"] = True
+        else:
+            print("You do not have storio")
         return True
 
     elif check_cmd("make", "bed"):

@@ -33,7 +33,8 @@ class Env:
                         "thriftech": True,
                         "stox": True,
                         "vocabuloid": True,
-                        "growlike": True
+                        "growlike": True,
+                        "storio": True
                     },
                 "completed":
                     {
@@ -41,7 +42,8 @@ class Env:
                         "thriftech": False,
                         "stox": False,
                         "vocabuloid": False,
-                        "growlike": False
+                        "growlike": False,
+                        "storio": False
                     }
             },
         "ratfighter":
@@ -115,7 +117,19 @@ class Env:
             },
         "vocabuloid":
             {
-
+                "best time": 0
+            },
+        "storio":
+            {
+                "credits": 50,
+                "stock":
+                    {
+                        "plunger": 1,
+                        "tea": 3,
+                        "cheese": 2,
+                        "wine": 3,
+                        "lip balm": 4
+                    }
             },
         "bedroom":
             {
