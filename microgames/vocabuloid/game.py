@@ -1,5 +1,6 @@
 from random import shuffle
 from enum import Enum
+from copy import deepcopy
 
 words = [
     "sensplicious",
@@ -23,7 +24,7 @@ words = [
 
 def run_vocabuloid():
     strikes = 0
-    test = words
+    test = deepcopy(words)
     shuffle(test)
 
     print("Welcome to Vocabuloid!")
