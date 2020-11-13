@@ -32,14 +32,16 @@ class Env:
                         "ratfighter": True,
                         "thriftech": True,
                         "stox": True,
-                        "vocabuloid": True
+                        "vocabuloid": True,
+                        "growlike": True
                     },
                 "completed":
                     {
                         "ratfighter": False,
                         "thriftech": False,
                         "stox": False,
-                        "vocabuloid": False
+                        "vocabuloid": False,
+                        "growlike": False
                     }
             },
         "ratfighter":

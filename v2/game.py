@@ -3,6 +3,7 @@ from microgames.ratfighter.game import run_ratfighter_21xx
 from microgames.thriftech.game import run_thriftech
 from microgames.stox.game import run_stox
 from microgames.vocabuloid.game import run_vocabuloid
+from microgames.growlike.game import run_growlike
 
 ROOMS = {}
 DESC = {}
@@ -200,6 +201,14 @@ def bedroom():
                 Env.data["games"]["completed"]["vocabuloid"] = True
         else:
             print("You do not have Vocabuloid.")
+        return True
+    elif check_cmd("play", "growlike"):
+        if Env.data["games"]["owned"]["growlike"]:
+            game_complete = run_growlike()
+            if game_complete:
+                Env.data["games"]["completed"]["growlike"] = True
+        else:
+            print("You do not have GrowLike.")
         return True
 
     elif check_cmd("make", "bed"):
