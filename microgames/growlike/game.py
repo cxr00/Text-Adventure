@@ -35,6 +35,7 @@ def level_up():
             current_levels[key] += 1
             if current_levels[key] == max_levels[key]:
                 current_levels[key] = "M"
+            print("Your %s is level %s" % (key, current_levels[key]))
 
 
 def run_growlike():
