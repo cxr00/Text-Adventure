@@ -221,7 +221,7 @@ def bedroom():
             if Env.data["storio"]["credits"] > 260:
                 Env.data["games"]["completed"]["storio"] = True
         else:
-            print("You do not have storio")
+            print("You do not have Storio.")
         return True
 
     elif check_cmd("make", "bed"):
