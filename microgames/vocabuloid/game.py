@@ -7,8 +7,17 @@ words = [
     "heteroscedasticity",
     "palilalia",
     "screamnastic",
-    "complexor"
-
+    "complexor",
+    "dioxyribonucleic",
+    "conflagration",
+    "grugnalious",
+    "pasghetti",
+    "indruxtable",
+    "gerrymandering",
+    "antediluvian",
+    "grandiloquent",
+    "infratumescent",
+    "zjinkonnerism"
 ]
 
 
