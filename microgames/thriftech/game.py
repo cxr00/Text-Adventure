@@ -269,7 +269,7 @@ def run_thriftech(data):
         valid_command = False
         if room == Room.AT_MACHINE:
             print("You are at the recycling machine.")
-            print("PROCESS TRASH\tWORKBENCH\tCOMPUTER\tINVENTORY")
+            print("PROCESS TRASH\tWORKBENCH\tCOMPUTER\tINVENTORY\tQUIT")
             get_cmd()
             if not universal_check():
                 valid_command = at_machine()
