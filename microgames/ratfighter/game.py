@@ -1,8 +1,63 @@
-from microgames.ratfighter.enums import Menu
-from microgames.ratfighter.player import Player
 from random import randint
+from enum import Enum
 
 cmd = []
+
+
+class Menu(Enum):
+
+    START = "start"
+    ACTION = "action"
+    SHOP = "shop"
+    FIGHT = "fight"
+    BATTLE = "battle"
+
+
+class Player:
+    data = {
+        "max health": 5,
+        "current health": 5,
+        "weapon": 2,
+        "armor": 0,
+        "accessory": 2,
+        "credits": 1,
+        "points": 0
+    }
+
+    # Player's current menu
+    MENU = Menu.START
+
+    @staticmethod
+    def reset():
+        Player.data = {
+            "max health": 5,
+            "current health": 5,
+            "weapon": 2,
+            "armor": 0,
+            "accessory": 2,
+            "credits": 1,
+            "points": Player.data["points"]
+        }
+
+        Player.MENU = Menu.START
+
+    @staticmethod
+    def change_menu(menu: Menu):
+        Player.MENU = menu
+
+    @staticmethod
+    def get_stats():
+        out = "HEALTH: %s / %s\n" % (str(Player.data["current health"]), str(Player.data["max health"]))
+        out += "WEAPON: %s\n" % str(Player.data["weapon"])
+        out += "ARMOR: %s\n" % str(Player.data["armor"])
+        out += "ACCESSORY: %s\n" % str(Player.data["accessory"])
+        out += "CREDITS: %s\n" % str(Player.data["credits"])
+        out += "POINTS: %s" % str(Player.data["points"])
+        return out
+
+    @staticmethod
+    def heal():
+        Player.data["current health"] = Player.data["max health"]
 
 
 def get_cmd():
@@ -49,6 +104,14 @@ def start_menu():
         Player.change_menu(Menu.ACTION)
     elif check_cmd("points"):
         print("You have earned %s points." % str(Player.data["points"]))
+    elif check_cmd("about"):
+        print("Welcome to RatFighter 21XX.")
+        print("Your task is to FIGHT rats and upgrade your stats in the SHOP.")
+        print("Keep an eye on your health, and make sure to HEAL often!")
+        print("Your weapon determines how much damage you deal.")
+        print("Your armor determines how much less damage you take.")
+        print("Your accessory determines how many credits you get for defeating a rat.")
+        print("Good luck! Begin the game by saying 'start' at the main menu!")
     elif check_cmd("reset"):
         are_you_sure = input("Are you sure? This will delete your progress. (y/n) >>> ")
         if are_you_sure[0] == "y":
@@ -194,14 +257,15 @@ def battle(*rat_stats):
     return True
 
 
-def run_ratfighter_21xx(data):
-    Player.data = data
+def run_ratfighter_21xx(data=None):
+    if data:
+        Player.data = data
     end = False
 
     while not end:
         if Player.MENU == Menu.START:
             print("MAIN MENU")
-            print("START\tPOINTS\tRESET\tQUIT")
+            print("START\tPOINTS\tABOUT\tRESET\tQUIT")
             get_cmd()
             if check_cmd("quit"):
                 end = True
