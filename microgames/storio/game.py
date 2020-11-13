@@ -70,7 +70,16 @@ def check_cmd(*args):
     return True
 
 
+def show_stats():
+    print("credits: %d" % data["credits"])
+    print("ITEM STOCK:")
+    for each in items:
+        print("%s: %d" % (each, data["stock"][each]))
+    print()
+
+
 def execute_day():
+    show_stats()
     print("A customer comes into your store.")
     # Get random item
     item = items[randint(0, len(items) - 1)]
@@ -97,7 +106,7 @@ def execute_day():
         if data["credits"] > price[item]:
             data["stock"][item] += 1
             data["credits"] -= price[item]
-            print("You order the %s. It is delivered right away." % item)
+            print("You order the %s for %d credits. It is delivered right away." % (item, price[item]))
         else:
             print("You cannot afford the %s" % item)
         return True
@@ -125,12 +134,6 @@ def run_storio(input_data=None):
                 end = True
                 print("Goodbye!")
                 return data
-            elif check_cmd("stats"):
-                print("credits: %d" % data["credits"])
-                print("ITEM STOCK:")
-                for each in items:
-                    print("%s: %d" % (each, data["stock"][each]))
-                print()
             else:
                 print("I don't understand %s." % " ".join(cmd))
         if data["credits"] > 260:
