@@ -2,6 +2,7 @@ from v2.env import Env, Room
 from microgames.ratfighter.game import run_ratfighter_21xx
 from microgames.thriftech.game import run_thriftech
 from microgames.stox.game import run_stox
+from microgames.vocabuloid.game import run_vocabuloid
 
 ROOMS = {}
 DESC = {}
@@ -192,6 +193,13 @@ def bedroom():
                 Env.data["games"]["completed"]["stox"] = True
         else:
             print("You do not have Stox")
+    elif check_cmd("play", "vocabuloid"):
+        if Env.data["games"]["owned"]["vocabuloid"]:
+            game_complete = run_vocabuloid()
+            if game_complete:
+                Env.data["games"]["completed"]["vocabuloid"] = True
+        else:
+            print("You do not have Vocabuloid.")
         return True
 
     elif check_cmd("make", "bed"):
