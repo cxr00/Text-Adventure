@@ -1,7 +1,53 @@
-from microgames.thriftech.recipes import MaterialRecipe, ComponentRecipe
-from microgames.thriftech.states import Room, Computer
-
 from random import randint
+from enum import Enum
+
+
+class Room(Enum):
+
+    AT_MACHINE = 0
+    AT_WORKBENCH = 1
+    AT_COMPUTER = 2
+    QUIT_GAME = 3
+
+
+class Computer:
+    data = {
+        "psu": False,
+        "motherboard": False,
+        "processor": False,
+        "graphics card": False,
+        "hard drive": False,
+        "solid state drive": False,
+        "ram": False
+    }
+
+    @staticmethod
+    def is_fixed():
+        return all(Computer.data.values())
+
+    @staticmethod
+    def reset():
+        for each in Computer.data:
+            Computer.data[each] = False
+
+
+class MaterialRecipe:
+    CIRCUIT_BOARD = (("glass", 1), ("plastic", 1), ("copper wire", 1))
+    CABLE = (("copper wire", 2), ("plastic", 1))
+    MICROCHIP = (("scrap metal", 1), ("plastic", 1), ("glass", 1))
+    CAPACITOR = (("scrap metal", 1), ("copper wire", 1), ("glass", 1))
+    CASING = (("scrap metal", 2), ("plastic", 1), ("glass", 1))
+
+
+class ComponentRecipe:
+    PSU = (("casing", 1), ("cable", 2), ("capacitor", 3))
+    MOTHERBOARD = (("circuit board", 2), ("cable", 1), ("microchip", 1))
+    PROCESSOR = (("microchip", 2), ("cable", 2), ("capacitor", 1))
+    GRAPHICS_CARD = (("casing", 1), ("microchip", 2), ("circuit board", 1))
+    HARD_DRIVE = (("casing", 1), ("circuit board", 1), ("cable", 2))
+    SOLID_STATE_DRIVE = (("casing", 1), ("circuit board", 1), ("microchip", 1))
+    RAM = (("microchip", 1), ("cable", 1), ("circuit board", 1))
+
 
 cmd = []
 inventory = {
@@ -257,12 +303,13 @@ def at_computer():
     return False
 
 
-def run_thriftech(data):
+def run_thriftech(data=None):
     global inventory
     global room
 
-    inventory = data["inventory"]
-    Computer.data = data["computer"]
+    if data:
+        inventory = data["inventory"]
+        Computer.data = data["computer"]
     end = False
 
     while not end:
