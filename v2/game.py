@@ -125,6 +125,13 @@ def debug_check():
         else:
             print("Failed to load game.")
         return True
+    elif check_cmd(["quit", "exit"]):
+        are_you_sure = input("Are you sure you want to quit? [y/n] >>> ")
+        if are_you_sure[0] == "y":
+            print("Goodbye.")
+            exit(0)
+        else:
+            return True
     elif check_cmd("debug"):
         pretty_data = json.dumps(Env.data, indent=2)
         print(pretty_data)
