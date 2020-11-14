@@ -220,19 +220,19 @@ def at_machine():
 
 # Craft ingredients into materials
 def at_workbench():
-    if check_cmd("craft") and len(cmd) == 1:
-        for each in material_recipes:
-            print(each + ":", end=" ")
-            for piece in material_recipes[each]:
-                print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
-            print()
-        return True
-
-    elif check_cmd("craft"):
-        for each in material_recipes:
-            if check_cmd("craft", *[k for k in (each.split(" "))]):
-                craft(each, material_recipes[each])
-                return True
+    if check_cmd("craft"):
+        if len(cmd) == 1:
+            for each in material_recipes:
+                print(each + ":", end=" ")
+                for piece in material_recipes[each]:
+                    print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
+                print()
+            return True
+        else:
+            for each in material_recipes:
+                if check_cmd("craft", *[k for k in (each.split(" "))]):
+                    craft(each, material_recipes[each])
+                    return True
 
     return False
 
@@ -246,19 +246,20 @@ def at_computer():
                 print("The %s is missing." % each)
         return True
 
-    elif check_cmd("craft") and len(cmd) == 1:
-        for each in component_recipes:
-            if not computer[each]:
-                print(each + ":", end=" ")
-                for piece in component_recipes[each]:
-                    print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
-                print()
-        return True
     elif check_cmd("craft"):
-        for each in component_recipes:
-            if check_cmd("craft", *[k for k in (each.split(" "))]):
-                craft(each, component_recipes[each])
-                return True
+        if len(cmd) == 1:
+            for each in component_recipes:
+                if not computer[each]:
+                    print(each + ":", end=" ")
+                    for piece in component_recipes[each]:
+                        print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
+                    print()
+            return True
+        else:
+            for each in component_recipes:
+                if check_cmd("craft", *[k for k in (each.split(" "))]):
+                    craft(each, component_recipes[each])
+                    return True
 
     elif check_cmd("fix", "computer"):
         at_least_one = False
