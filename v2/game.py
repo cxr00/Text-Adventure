@@ -204,6 +204,7 @@ def bedroom():
                 Env.data["games"]["completed"]["stox"] = True
         else:
             print("You do not have Stox")
+        return True
     elif check_cmd("play", "vocabuloid"):
         if Env.data["games"]["owned"]["vocabuloid"]:
             game_complete = run_vocabuloid(Env.data["vocabuloid"]["best time"])
