@@ -19,7 +19,9 @@ words = [
     "antediluvian",
     "grandiloquent",
     "infratumescent",
-    "zjinkonnerism"
+    "zjinkonnerism",
+    "pavlovically",
+    "disembuttholed"
 ]
 
 
