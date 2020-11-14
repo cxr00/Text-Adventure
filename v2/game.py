@@ -249,12 +249,12 @@ def bathroom():
         print("Nothing remarkable. A shower but no tub.")
         print("The toilet lid is up.")
         if Env.data["bathroom"]["thriftech"]:
-            print("There is a THRIFTECH cartridge on the floor.")
+            print("There is a ThrifTech module on the floor.")
         return True
-    elif check_cmd(["take", "get", "grab"], ["thriftech", "cartridge"]) and Env.data["bathroom"]["thriftech"]:
+    elif check_cmd(["take", "get", "grab"], ["thriftech", "module"]) and Env.data["bathroom"]["thriftech"]:
         Env.data["bathroom"]["thriftech"] = False
         Env.data["games"]["owned"]["thriftech"] = True
-        print("You grab the THRIFTECH cartridge.")
+        print("You grab the ThrifTech cartridge.")
         print("You can now PLAY it in your bedroom.")
         return True
 
@@ -284,7 +284,7 @@ def run_game():
 
             # if Env.data["player"]["current room"] == room.value:
             #
-            #     if Env.data["player"]["previous room"] != room:.value
+            #     if Env.data["player"]["previous room"] != room.value
             #         print(DESC[room])
             #
             #     Env.data["player"]["previous room"] = Env.data["player"]["current room"]

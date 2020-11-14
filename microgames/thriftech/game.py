@@ -10,43 +10,43 @@ class Room(Enum):
     QUIT_GAME = 3
 
 
-class Computer:
-    data = {
-        "psu": False,
-        "motherboard": False,
-        "processor": False,
-        "graphics card": False,
-        "hard drive": False,
-        "solid state drive": False,
-        "ram": False
-    }
-
-    @staticmethod
-    def is_fixed():
-        return all(Computer.data.values())
-
-    @staticmethod
-    def reset():
-        for each in Computer.data:
-            Computer.data[each] = False
+computer = {
+    "psu": False,
+    "motherboard": False,
+    "processor": False,
+    "graphics card": False,
+    "hard drive": False,
+    "solid state drive": False,
+    "ram": False
+}
 
 
-class MaterialRecipe:
-    CIRCUIT_BOARD = (("glass", 1), ("plastic", 1), ("copper wire", 1))
-    CABLE = (("copper wire", 2), ("plastic", 1))
-    MICROCHIP = (("scrap metal", 1), ("plastic", 1), ("glass", 1))
-    CAPACITOR = (("scrap metal", 1), ("copper wire", 1), ("glass", 1))
-    CASING = (("scrap metal", 2), ("plastic", 1), ("glass", 1))
+def computer_is_fixed():
+    return all(computer.values())
 
 
-class ComponentRecipe:
-    PSU = (("casing", 1), ("cable", 2), ("capacitor", 3))
-    MOTHERBOARD = (("circuit board", 2), ("cable", 1), ("microchip", 1))
-    PROCESSOR = (("microchip", 2), ("cable", 2), ("capacitor", 1))
-    GRAPHICS_CARD = (("casing", 1), ("microchip", 2), ("circuit board", 1))
-    HARD_DRIVE = (("casing", 1), ("circuit board", 1), ("cable", 2))
-    SOLID_STATE_DRIVE = (("casing", 1), ("circuit board", 1), ("microchip", 1))
-    RAM = (("microchip", 1), ("cable", 1), ("circuit board", 1))
+def reset_computer():
+    for each in computer:
+        computer[each] = False
+
+
+material_recipes = {
+    "circuit board": (("glass", 1), ("plastic", 1), ("copper wire", 1)),
+    "cable": (("copper wire", 2), ("plastic", 1)),
+    "microchip": (("scrap metal", 1), ("plastic", 1), ("glass", 1)),
+    "capacitor": (("scrap metal", 1), ("copper wire", 1), ("glass", 1)),
+    "casing": (("scrap metal", 2), ("plastic", 1), ("glass", 1))
+}
+
+component_recipes = {
+    "psu": (("casing", 1), ("cable", 2), ("capacitor", 3)),
+    "motherboard": (("circuit board", 2), ("cable", 1), ("microchip", 1)),
+    "processor": (("microchip", 2), ("cable", 2), ("capacitor", 1)),
+    "graphics card": (("casing", 1), ("microchip", 2), ("circuit board", 1)),
+    "hard drive": (("casing", 1), ("circuit board", 1), ("cable", 2)),
+    "solid state drive": (("casing", 1), ("circuit board", 1), ("microchip", 1)),
+    "ram": (("microchip", 1), ("cable", 1), ("circuit board", 1))
+}
 
 
 cmd = []
@@ -96,6 +96,8 @@ def craft(item_name, recipe):
             pass
         else:
             print("You do not have sufficient materials to craft this.")
+            for r in recipe:
+                print(r[0], "%d / %d" % (inventory[r[0]], r[1]))
             return False
 
     # Remove items from player's inventory
@@ -171,7 +173,7 @@ def universal_check():
         room = Room.QUIT_GAME
         return True
     elif check_cmd("reset"):
-        Computer.reset()
+        reset_computer()
         reset_inventory()
         room = Room.AT_MACHINE
         print("You have reset your progress.")
@@ -219,27 +221,18 @@ def at_machine():
 # Craft ingredients into materials
 def at_workbench():
     if check_cmd("craft") and len(cmd) == 1:
-        print("CIRCUIT BOARD: " + str(MaterialRecipe.CIRCUIT_BOARD))
-        print("CABLE: " + str(MaterialRecipe.CABLE))
-        print("MICROCHIP: " + str(MaterialRecipe.MICROCHIP))
-        print("CAPACITOR: " + str(MaterialRecipe.CAPACITOR))
-        print("CASING: " + str(MaterialRecipe.CASING))
+        for each in material_recipes:
+            print(each + ":", end=" ")
+            for piece in material_recipes[each]:
+                print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
+            print()
         return True
-    elif check_cmd("craft", "circuit", "board"):
-        craft("circuit board", MaterialRecipe.CIRCUIT_BOARD)
-        return True
-    elif check_cmd("craft", "cable"):
-        craft("cable", MaterialRecipe.CABLE)
-        return True
-    elif check_cmd("craft", "microchip"):
-        craft("microchip", MaterialRecipe.MICROCHIP)
-        return True
-    elif check_cmd("craft", "capacitor"):
-        craft("capacitor", MaterialRecipe.CAPACITOR)
-        return True
-    elif check_cmd("craft", "casing"):
-        craft("casing", MaterialRecipe.CASING)
-        return True
+
+    elif check_cmd("craft"):
+        for each in material_recipes:
+            if check_cmd("craft", *[k for k in (each.split(" "))]):
+                craft(each, material_recipes[each])
+                return True
 
     return False
 
@@ -247,49 +240,32 @@ def at_workbench():
 # Build materials into components
 # Place the components into the computer
 def at_computer():
-    if check_cmd(["look", "view", "check"], "computer"):
-        for each in Computer.data:
-            if not Computer.data[each]:
+    if check_cmd(["look", "view", "check"], "computer") or check_cmd("computer"):
+        for each in computer:
+            if not computer[each]:
                 print("The %s is missing." % each)
         return True
 
     elif check_cmd("craft") and len(cmd) == 1:
-        print("PSU: " + str(ComponentRecipe.PSU))
-        print("MOTHERBOARD: " + str(ComponentRecipe.MOTHERBOARD))
-        print("PROCESSOR: " + str(ComponentRecipe.PROCESSOR))
-        print("GRAPHICS CARD: " + str(ComponentRecipe.GRAPHICS_CARD))
-        print("HARD DRIVE: " + str(ComponentRecipe.HARD_DRIVE))
-        print("SOLID STATE DRIVE: " + str(ComponentRecipe.SOLID_STATE_DRIVE))
-        print("RAM: " + str(ComponentRecipe.RAM))
+        for each in component_recipes:
+            if not computer[each]:
+                print(each + ":", end=" ")
+                for piece in component_recipes[each]:
+                    print("%s %d / %d" % (piece[0], inventory[piece[0]], piece[1]), end=", ")
+                print()
         return True
-    elif check_cmd("craft", "psu"):
-        craft("psu", ComponentRecipe.PSU)
-        return True
-    elif check_cmd("craft", "motherboard"):
-        craft("motherboard", ComponentRecipe.MOTHERBOARD)
-        return True
-    elif check_cmd("craft", "processor"):
-        craft("processor", ComponentRecipe.PROCESSOR)
-        return True
-    elif check_cmd("craft", "graphics", "card"):
-        craft("graphics card", ComponentRecipe.GRAPHICS_CARD)
-        return True
-    elif check_cmd("craft", "hard", "drive"):
-        craft("hard drive", ComponentRecipe.HARD_DRIVE)
-        return True
-    elif check_cmd("craft", "solid", "state", "drive"):
-        craft("solid state drive", ComponentRecipe.SOLID_STATE_DRIVE)
-        return True
-    elif check_cmd("craft", "ram"):
-        craft("ram", ComponentRecipe.RAM)
-        return True
+    elif check_cmd("craft"):
+        for each in component_recipes:
+            if check_cmd("craft", *[k for k in (each.split(" "))]):
+                craft(each, component_recipes[each])
+                return True
 
     elif check_cmd("fix", "computer"):
         at_least_one = False
-        for each in Computer.data:
-            if not Computer.data[each] and inventory[each] >= 1:
+        for each in computer:
+            if not computer[each] and inventory[each] >= 1:
                 inventory[each] -= 1
-                Computer.data[each] = True
+                computer[each] = True
                 at_least_one = True
                 print("You install the new %s in the computer." % each)
         if not at_least_one:
@@ -306,10 +282,11 @@ def at_computer():
 def run_thriftech(data=None):
     global inventory
     global room
+    global computer
 
     if data:
         inventory = data["inventory"]
-        Computer.data = data["computer"]
+        computer = data["computer"]
     end = False
 
     while not end:
@@ -324,7 +301,7 @@ def run_thriftech(data=None):
                 valid_command = True
         elif room == Room.AT_WORKBENCH:
             print("You are at the workbench.")
-            print("CRAFT\tMACHINE\tCOMPUTER\tINVENTORY")
+            print("CRAFT\tMACHINE\tCOMPUTER\tINVENTORY\tQUIT")
             get_cmd()
             if not universal_check():
                 valid_command = at_workbench()
@@ -332,13 +309,13 @@ def run_thriftech(data=None):
                 valid_command = True
         elif room == Room.AT_COMPUTER:
             print("You are at the defunct computer.")
-            print("CRAFT\tLOOK COMPUTER\tFIX COMPUTER\tMACHINE\tWORKBENCH\tINVENTORY")
+            print("CRAFT\tLOOK COMPUTER\tFIX COMPUTER\tMACHINE\tWORKBENCH\tINVENTORY\tQUIT")
             get_cmd()
             if not universal_check():
                 valid_command = at_computer()
             else:
                 valid_command = True
-            if Computer.is_fixed():
+            if computer_is_fixed():
                 end = True
                 print("You have completely fixed the computer.")
         elif room == Room.QUIT_GAME:
@@ -350,8 +327,8 @@ def run_thriftech(data=None):
         if not valid_command:
             print("I don't understand \"%s\"" % " ".join(cmd))
 
-    if Computer.is_fixed():
+    if computer_is_fixed():
         print("GAME COMPLETE. CONGRATULATIONS!")
         room = Room.AT_MACHINE
 
-    return {"computer": Computer.data, "inventory": inventory}
+    return {"computer": computer, "inventory": inventory}
