@@ -95,10 +95,9 @@ def execute_day():
             data["stock"][item] -= 1
             data["credits"] += sell_price
             print("You sell the %s for %d credits.\n" % (item, sell_price))
-            return True
         else:
             print("You do not have that item in stock")
-            return True
+        return True
     elif check_cmd("reject"):
         print("You reject the customer's offer.")
         return True
