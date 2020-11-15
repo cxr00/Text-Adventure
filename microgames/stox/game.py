@@ -180,9 +180,10 @@ def check_sell():
         return True
 
 
-def run_stox(input_data):
+def run_stox(input_data=None):
     global data
-    data = input_data
+    if input_data:
+        data = input_data
 
     process_day()
 
