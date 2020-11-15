@@ -83,3 +83,15 @@ class Env:
         except FileNotFoundError:
             return False
         return True
+
+    @staticmethod
+    def show_saves():
+        save_games = []
+        if not os.path.exists("saves"):
+            os.mkdir("saves")
+        for each in os.listdir("saves"):
+            name = " ".join(each.split("_")[:-1])
+            if name not in save_games:
+                save_games.append(name)
+        for each in save_games:
+            print(each)

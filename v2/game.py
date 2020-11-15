@@ -115,15 +115,18 @@ def misc_check():
 def debug_check():
     if check_cmd("save"):
         if Env.save(cmd[1:]):
-            print("Game saved.")
+            print("Game '%s' saved." % " ".join(cmd[1:]))
         else:
-            print("Failed to save game.")
+            print("Failed to save game '%s'." % " ".join(cmd[1:]))
         return True
     elif check_cmd("load"):
         if Env.load(cmd[1:]):
-            print("Game loaded.")
+            print("Game '%s' loaded." % " ".join(cmd[1:]))
         else:
-            print("Failed to load game.")
+            print("Failed to load game '%s'." % " ".join(cmd[1:]))
+        return True
+    elif check_cmd(["view", "look"], ["save", "saves"]):
+        Env.show_saves()
         return True
     elif check_cmd(["quit", "exit"]):
         are_you_sure = input("Are you sure you want to quit? [y/n] >>> ")
