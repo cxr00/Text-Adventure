@@ -93,5 +93,13 @@ class Env:
             name = " ".join(each.split("_")[:-1])
             if name not in save_games:
                 save_games.append(name)
-        for each in save_games:
-            print(each)
+        if len(save_games) == 0:
+            print("You have no save games.")
+        else:
+            for each in save_games:
+                print(each)
+
+    @staticmethod
+    def change_room(new_room):
+        Env.data["player"]["previous room"] = Env.data["player"]["current room"]
+        Env.data["player"]["current room"] = new_room.value

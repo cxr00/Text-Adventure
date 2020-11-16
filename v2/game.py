@@ -13,9 +13,6 @@ DESC = {}
 end = False
 cmd = []
 
-current_room = Room.BEDROOM
-previous_loc = None
-
 
 def get_cmd():
     """
@@ -61,7 +58,6 @@ def go(*loc):
     Changes room based on given loc as long as the command starts with 'go' or 'go to'
     :param loc: The possible locations to travel and their associated commands
     """
-    global current_room
 
     if check_cmd("go"):
         n = 2 if cmd[1] == "to" else 1
@@ -70,12 +66,10 @@ def go(*loc):
             # Returns True if there is at least one match
             if isinstance(e[0], list):
                 if cmd[n] in e[0]:
-                    # Player.change_room(e[1])
-                    current_room = e[1]
+                    Env.change_room(e[1])
                     return True
             elif cmd[n] == e[0]:
-                # Player.change_room(e[1])
-                current_room = e[1]
+                Env.change_room(e[1])
                 return True
     return False
 
@@ -113,21 +107,25 @@ def misc_check():
 
 
 def debug_check():
+    # Save the game with the given command as the file name
     if check_cmd("save"):
         if Env.save(cmd[1:]):
             print("Game '%s' saved." % " ".join(cmd[1:]))
         else:
             print("Failed to save game '%s'." % " ".join(cmd[1:]))
         return True
+    # Load the game with the given command as the file name
     elif check_cmd("load"):
         if Env.load(cmd[1:]):
             print("Game '%s' loaded." % " ".join(cmd[1:]))
         else:
             print("Failed to load game '%s'." % " ".join(cmd[1:]))
         return True
-    elif check_cmd(["view", "look"], ["save", "saves"]):
+    # View all save games
+    elif check_cmd(["view", "look", "show"], ["save", "saves"]):
         Env.show_saves()
         return True
+    # Quit the game
     elif check_cmd(["quit", "exit"]):
         are_you_sure = input("Are you sure you want to quit? [y/n] >>> ")
         if are_you_sure[0] == "y":
@@ -275,31 +273,14 @@ def bathroom():
 
 def run_game():
     global end
-    global current_room
-    global previous_loc
 
     while not end:
 
         for room in Room:
-            if current_room == room:
 
-                # Only print room description when you enter a room
-                if previous_loc != room:
-                    print(DESC[room])
-                previous_loc, current_room = current_room, room
-
-                # Run the specific room function
+            if Env.data["player"]["current room"] == room.value:
+                print(DESC[room])
                 ROOMS[room]()
-
-                break
-
-            # if Env.data["player"]["current room"] == room.value:
-            #
-            #     if Env.data["player"]["previous room"] != room.value
-            #         print(DESC[room])
-            #
-            #     Env.data["player"]["previous room"] = Env.data["player"]["current room"]
-            #     Env.data["player"]["current room"] = room.value
 
     print("Game Complete! Congratulations!")
 
