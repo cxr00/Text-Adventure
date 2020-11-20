@@ -5,3 +5,5 @@ __pycache__/
 saves/
 __pycache__\env.cpython-38.pyc
 *.pyc
+v2/log.txt
+microgames/farmageddon/log.txt
