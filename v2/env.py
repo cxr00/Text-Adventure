@@ -34,7 +34,8 @@ class Env:
                         "stox": True,
                         "vocabuloid": True,
                         "growlike": True,
-                        "storio": True
+                        "storio": True,
+                        "farmageddon": True
                     },
                 "completed":
                     {
@@ -43,7 +44,8 @@ class Env:
                         "stox": False,
                         "vocabuloid": False,
                         "growlike": False,
-                        "storio": False
+                        "storio": False,
+                        "farmageddon": False
                     }
             },
         "ratfighter": None,
@@ -54,6 +56,7 @@ class Env:
                 "best time": 0
             },
         "storio": None,
+        "farmageddon": None,
         "bedroom":
             {
                 "bed made": False,

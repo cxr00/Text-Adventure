@@ -6,6 +6,7 @@ from microgames.stox.game import run_stox
 from microgames.vocabuloid.game import run_vocabuloid
 from microgames.growlike.game import run_growlike
 from microgames.storio.game import run_storio
+from microgames.farmageddon.game import run_farmageddon
 
 ROOMS = {}
 DESC = {}
@@ -18,8 +19,14 @@ def get_cmd():
     """
     Takes input and converts it into an array command
     """
+
+    def log(s):
+        with open("log.txt", "a+") as f:
+            f.write(" ".join(s) + "\n")
+
     global cmd
     cmd = [e.lower() for e in input(">>> ").split(" ")]
+    log(cmd)
 
 
 def check_cmd(*args):
@@ -58,6 +65,7 @@ def go(*loc):
     Changes room based on given loc as long as the command starts with 'go' or 'go to'
     :param loc: The possible locations to travel and their associated commands
     """
+    global cmd
 
     if check_cmd("go"):
         n = 2 if cmd[1] == "to" else 1
@@ -231,6 +239,12 @@ def bedroom():
                 Env.data["games"]["completed"]["storio"] = True
         else:
             print("You do not have Storio.")
+        return True
+    elif check_cmd("play", "farmageddon"):
+        if Env.data["games"]["owned"]["storio"]:
+            Env.data["farmageddon"] = run_farmageddon(Env.data["farmageddon"])
+        else:
+            print("You do not have Farmageddon")
         return True
 
     elif check_cmd("make", "bed"):
