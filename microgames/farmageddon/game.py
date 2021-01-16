@@ -6,6 +6,7 @@ import random
 class Room(Enum):
     FARM = "farm"
     CAVE = "cave"
+    DEEP = "deep"
     FOREST = "forest"
     BEACH = "beach"
 
@@ -22,7 +23,8 @@ data = {
 
             "shroomlet": 0,
             "cooked shroomlet": 0,
-            "twig": 0
+            "twig": 0,
+            "egg spawn": 0
         },
 
     "farm":
@@ -37,6 +39,7 @@ DESC = {}
 MENUS = {
     "farm": "CAVE\tFOREST\tBEACH\tLOOK AROUND\tQUIT",
     "cave": "FARM\tFOREST\tBEACH\tLOOK AROUND\tQUIT",
+    "deep": "CAVE\tLOOK AROUND\tQUIT",
     "forest": "FARM\tCAVE\tBEACH\tLOOK AROUND\tQUIT",
     "beach": "FARM\tCAVE\tFOREST\tLOOK AROUND\tQUIT"
 }
@@ -127,9 +130,14 @@ def change_room(new_room=None):
 
 def inventory_check():
     if look(["items", "inventory"]):
+        at_least_one = False
         for key, value in data["inventory"].items():
             if data["inventory"][key] > 0:
+                at_least_one = True
                 print("%s: %d" % (key, data["inventory"][key]))
+        if not at_least_one:
+            print("Your inventory is empty.")
+        return True
 
     elif check_cmd("eat", "shroomlet"):
         if data["inventory"]["cooked shroomlet"] > 0:
@@ -238,11 +246,36 @@ def cave():
     if look_around("cave"):
         print("A dank and damp cave.")
         print("There are SHROOMLETS on the ground. You can PICK them.")
+        print("You can also VENTURE into the DEEP.")
         return True
 
     elif check_cmd(["pick", "harvest", "take", "grab", "gather"], ["shroomlet", "shroomlets"]):
         data["inventory"]["shroomlet"] += 1
         print("You pick a shroomlet. It is very fuzzy.")
+        return True
+
+    elif check_cmd(["go", "venture"], "deep") or check_cmd(["go", "venture"], ["to", "into"], "deep"):
+        change_room("deep")
+        print("You venture further into the cave.")
+        return True
+
+    return False
+
+
+@register_room("deep", "You are in the deepest part of the cave.")
+def deep():
+    if check_cmd("go", ["out", "back", "cave"]):
+        change_room("cave")
+        return True
+
+    elif look_around("deep"):
+        print("There is a gently pulsating SNAKEMESH.")
+        print("You can HARVEST it for egg spawn.")
+        return True
+
+    elif check_cmd(["take", "harvest", "grab", "gather", "get"], ["snakemesh", "spawn", "mesh"]):
+        data["inventory"]["egg spawn"] += 1
+        print("You harvest the EGG SPAWN")
         return True
 
     return False
@@ -294,11 +327,16 @@ def run_farmageddon(input_data=None):
     global data
     global end
 
+    end = False
+    data["previous location"] = None
+
     if input_data:
         data = input_data
 
     print("Welcome to Farmageddon!")
-    print("Instructions for how to play will go here.")
+    print("Things are pretty bad here.")
+    print("You subsist on mushrooms and sleep in a tent.")
+    print("For fun you can comb the beach for trinkets.")
     input("Press enter to begin.")
 
     while not end:
