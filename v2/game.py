@@ -195,6 +195,8 @@ def bedroom():
     elif check_cmd("play", "ratfighter"):
         if Env.data["games"]["owned"]["ratfighter"]:
             Env.data["ratfighter"] = run_ratfighter_21xx(Env.data["ratfighter"])
+            if Env.data["ratfighter"]["points"] >= 50:
+                Env.data["games"]["completed"]["ratfighter"] = True
         else:
             print("You do not have RatFighter.")
         return True
@@ -241,7 +243,7 @@ def bedroom():
             print("You do not have Storio.")
         return True
     elif check_cmd("play", "farmageddon"):
-        if Env.data["games"]["owned"]["storio"]:
+        if Env.data["games"]["owned"]["farmageddon"]:
             Env.data["farmageddon"] = run_farmageddon(Env.data["farmageddon"])
         else:
             print("You do not have Farmageddon")
@@ -262,8 +264,10 @@ def bedroom():
             print("You have already tidied up.")
         return True
 
-    elif go(("bathroom", Room.BATHROOM)):
+    elif go(("bathroom", Room.BATHROOM), ("chamber", Room.CHAMBER)):
         return True
+
+    return False
 
 
 @register_room(Room.BATHROOM, "You are in your very own bathroom.")
@@ -277,12 +281,22 @@ def bathroom():
     elif check_cmd(["take", "get", "grab"], ["thriftech", "module"]) and Env.data["bathroom"]["thriftech"]:
         Env.data["bathroom"]["thriftech"] = False
         Env.data["games"]["owned"]["thriftech"] = True
-        print("You grab the ThrifTech cartridge.")
+        print("You grab the ThrifTech module.")
         print("You can now PLAY it in your bedroom.")
         return True
 
     elif go((["bedroom", "room"], Room.BEDROOM)):
         return True
+
+    return False
+
+
+@register_room(Room.CHAMBER, "You are in the digital chamber.")
+def chamber():
+    if go((["bedroom", "room"], Room.BEDROOM)):
+        return True
+
+    return False
 
 
 def run_game():
@@ -292,8 +306,10 @@ def run_game():
 
         for room in Room:
 
-            if Env.data["player"]["current room"] == room.value:
-                print(DESC[room])
+            if Env.data["player"]["location"] == room.value:
+                if Env.data["player"]["previous location"] != room.value:
+                    print(DESC[room])
+                    Env.change_room(room)
                 ROOMS[room]()
 
     print("Game Complete! Congratulations!")

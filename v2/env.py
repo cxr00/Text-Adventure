@@ -7,6 +7,7 @@ class Room(Enum):
     BEDROOM = "bedroom"
     BATHROOM = "bathroom"
     KITCHEN = "kitchen"
+    CHAMBER = "chamber"
 
     NULL = "null"
 
@@ -22,8 +23,8 @@ class Env:
     data = {
         "player":
             {
-                "current room": "bedroom",
-                "previous room": None
+                "location": "chamber",
+                "previous location": None
             },
         "games":
             {
@@ -104,5 +105,5 @@ class Env:
 
     @staticmethod
     def change_room(new_room):
-        Env.data["player"]["previous room"] = Env.data["player"]["current room"]
-        Env.data["player"]["current room"] = new_room.value
+        Env.data["player"]["previous location"] = Env.data["player"]["location"]
+        Env.data["player"]["location"] = new_room.value
