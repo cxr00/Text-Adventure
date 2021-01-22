@@ -68,13 +68,16 @@ inventory = {
     "graphics card": 0,
     "hard drive": 0,
     "solid state drive": 0,
-    "ram": 0
+    "ram": 0,
+
+    "computer": 0
 }
 
 
 def reset_inventory():
     for each in inventory:
-        inventory[each] = 0
+        if each != "computer":
+            inventory[each] = 0
 
 
 room = Room.AT_MACHINE
@@ -330,6 +333,13 @@ def run_thriftech(data=None):
 
     if computer_is_fixed():
         print("GAME COMPLETE. CONGRATULATIONS!")
+        inventory["computer"] += 1
+        reset_computer()
         room = Room.AT_MACHINE
 
+    print(computer, "\n", inventory)
+
     return {"computer": computer, "inventory": inventory}
+
+
+run_thriftech()
