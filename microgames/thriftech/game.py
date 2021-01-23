@@ -340,6 +340,3 @@ def run_thriftech(data=None):
     print(computer, "\n", inventory)
 
     return {"computer": computer, "inventory": inventory}
-
-
-run_thriftech()
