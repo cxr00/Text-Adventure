@@ -23,7 +23,7 @@ class Env:
     data = {
         "player":
             {
-                "location": "chamber",
+                "location": "bedroom",
                 "previous location": None
             },
         "games":
