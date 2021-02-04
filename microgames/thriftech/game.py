@@ -337,6 +337,4 @@ def run_thriftech(data=None):
         reset_computer()
         room = Room.AT_MACHINE
 
-    print(computer, "\n", inventory)
-
     return {"computer": computer, "inventory": inventory}
