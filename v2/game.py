@@ -14,6 +14,16 @@ DESC = {}
 end = False
 cmd = []
 
+run_microgame = {
+    "farmageddon": run_farmageddon,
+    "growlike": run_growlike,
+    "ratfighter": run_ratfighter_21xx,
+    "storio": run_storio,
+    "stox": run_stox,
+    "thriftech": run_thriftech,
+    "vocabuloid": run_vocabuloid
+}
+
 
 def get_cmd():
     """
@@ -179,6 +189,12 @@ def register_room(room, description):
 
 @register_room(Room.BEDROOM, "You are in your bedroom.")
 def bedroom():
+    for game in Env.data["games"]["owned"]:
+        if check_cmd("play", game):
+            Env.data[game] = run_microgame[game](Env.data[game])
+            print("You exit the game.")
+            return True
+
     if look_around("bedroom"):
         print("Your bedroom.")
         print("Your Game Engine 2 and a television are in here with you.")
@@ -191,64 +207,6 @@ def bedroom():
         else:
             print("Your room is tidy.")
         return True
-
-    elif check_cmd("play", "ratfighter"):
-        if Env.data["games"]["owned"]["ratfighter"]:
-            Env.data["ratfighter"] = run_ratfighter_21xx(Env.data["ratfighter"])
-            if Env.data["ratfighter"]["points"] >= 50:
-                Env.data["games"]["completed"]["ratfighter"] = True
-        else:
-            print("You do not have RatFighter.")
-        return True
-    elif check_cmd("play", "thriftech"):
-        if Env.data["games"]["owned"]["thriftech"]:
-            Env.data["thriftech"] = run_thriftech(Env.data["thriftech"])
-            if all(Env.data["thriftech"]["computer"].values()):
-                Env.data["games"]["completed"]["thriftech"] = True
-        else:
-            print("You do not have ThrifTech.")
-        return True
-    elif check_cmd("play", "stox"):
-        if Env.data["games"]["owned"]["stox"]:
-            Env.data["stox"] = run_stox(Env.data["stox"])
-            if Env.data["stox"]["credits"] >= 200:
-                Env.data["games"]["completed"]["stox"] = True
-        else:
-            print("You do not have Stox")
-        return True
-    elif check_cmd("play", "vocabuloid"):
-        if Env.data["games"]["owned"]["vocabuloid"]:
-            game_complete = run_vocabuloid(Env.data["vocabuloid"]["best time"])
-            if game_complete:
-                Env.data["games"]["completed"]["vocabuloid"] = True
-                if game_complete < Env.data["vocabuloid"]["best time"] or Env.data["vocabuloid"]["best time"] == 0:
-                    Env.data["vocabuloid"]["best time"] = game_complete
-        else:
-            print("You do not have Vocabuloid.")
-        return True
-    elif check_cmd("play", "growlike"):
-        if Env.data["games"]["owned"]["growlike"]:
-            game_complete = run_growlike()
-            if game_complete:
-                Env.data["games"]["completed"]["growlike"] = True
-        else:
-            print("You do not have GrowLike.")
-        return True
-    elif check_cmd("play", "storio"):
-        if Env.data["games"]["owned"]["storio"]:
-            Env.data["storio"] = run_storio(Env.data["storio"])
-            if Env.data["storio"]["credits"] > 260:
-                Env.data["games"]["completed"]["storio"] = True
-        else:
-            print("You do not have Storio.")
-        return True
-    elif check_cmd("play", "farmageddon"):
-        if Env.data["games"]["owned"]["farmageddon"]:
-            Env.data["farmageddon"] = run_farmageddon(Env.data["farmageddon"])
-        else:
-            print("You do not have Farmageddon")
-        return True
-
     elif check_cmd("make", "bed"):
         if not Env.data["bedroom"]["bed made"]:
             Env.data["bedroom"]["bed made"] = True
