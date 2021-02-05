@@ -193,6 +193,7 @@ def bedroom():
         if check_cmd("play", game):
             Env.data[game] = run_microgame[game](Env.data[game])
             print("You exit the game.")
+            print("You are back in your bedroom.")
             return True
 
     if look_around("bedroom"):
